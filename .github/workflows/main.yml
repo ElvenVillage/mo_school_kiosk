@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  # push:
+    # branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  build:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+         
+      - name: Install ninja-build tool
+        uses: seanmiddleditch/gha-setup-ninja@v4
+            
+      - name: Flutter action
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.9'
+          
+      - name: Build
+        run: |
+          sudo apt-get install libgtk-3-0 libblkid1 liblzma5 libgtk-3-dev
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          flutter build linux
+          cp -a build/linux/x64/release/bundle/. kiosk-dovuz/bin/
+          mv kiosk-dovuz/bin/mo_school_kiosk kiosk-dovuz/bin/kiosk-dovuz
+          dpkg-deb --build kiosk-dovuz
+          
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          path: kiosk-dovuz.deb
+          overwrite: true
+          
+

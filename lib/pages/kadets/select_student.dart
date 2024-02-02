@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:mo_school_kiosk/api/api.dart';
+import 'package:mo_school_kiosk/api/groups.dart';
+import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/pages/kadets/student_details.dart';
+import 'package:mo_school_kiosk/style.dart';
+import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/base_card.dart';
+import 'package:mo_school_kiosk/widgets/page_template.dart';
+
+class SelectStudentPage extends StatelessWidget {
+  const SelectStudentPage(this.school, this.group, {super.key});
+
+  final School school;
+  final Group group;
+
+  static Route route(School school, Group group) =>
+      createRoute((_) => SelectStudentPage(school, group));
+
+  @override
+  Widget build(BuildContext context) {
+    return PageTemplate(
+        title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ',
+        subtitle: 'Выберите обучающегося',
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: BaseCard(db: school),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      group.name,
+                      style: context.headlineLarge,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            Expanded(
+              child: FutureBuilder(
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final students = snapshot.data!.answer.data;
+                    return GridView.count(
+                      crossAxisCount: 5,
+                      childAspectRatio: 3,
+                      children: [
+                        for (final student in students)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                  StudentDetailsPage.route(school, student));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 64.0,
+                                    backgroundImage: NetworkImage(student
+                                        .photoUrl('nnz', 'Sonyk12345678')),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(student.fio),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+                future: client.getStudents(school.id, group.id),
+              ),
+            ),
+          ],
+        ));
+  }
+}
