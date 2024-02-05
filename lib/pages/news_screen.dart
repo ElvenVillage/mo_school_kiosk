@@ -62,7 +62,7 @@ class _NewsScreenState extends State<NewsScreen> {
         result.addAll(RssFeed.parse((await dio.get(school)).data).items);
       } catch (_) {}
     }
-    return result..sort((a, b) => a.date.compareTo(b.date));
+    return result..sort((a, b) => b.date.compareTo(a.date));
   }
 
   @override
@@ -149,9 +149,9 @@ class _NewsCard extends StatelessWidget {
 
 extension ParseDate on RssItem {
   static final _format = DateFormat('E, d MMM yyyy HH:mm:ss zzz', 'en_US');
-  static final _displayFormat = DateFormat('d MMMM yyyy, hh:mm', 'ru_RU');
+  static final _displayFormat = DateFormat('d MMMM yyyy', 'ru_RU');
 
-  DateTime get date => _format.parse(pubDate!);
+  DateTime get date => _format.parse(pubDate!).toLocal();
   String get formattedDate => _displayFormat.format(date);
 }
 

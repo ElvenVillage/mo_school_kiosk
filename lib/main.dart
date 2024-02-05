@@ -105,6 +105,8 @@ class App extends StatelessWidget {
       create: (context) => StatsProvider()..load(),
       child: MaterialApp(
         theme: ThemeData.dark().copyWith(
+            progressIndicatorTheme:
+                const ProgressIndicatorThemeData(color: Colors.white),
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary)),
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
