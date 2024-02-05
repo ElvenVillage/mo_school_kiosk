@@ -11,10 +11,24 @@ class StudentsCount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<StatsProvider>();
-    final count = data
-        .getReportData(ReportIndicator.totalStudent)
-        .values
-        .fold(0, (prev, next) => prev + next!.toInt());
+
+    final countM = (data.stats[Indicator.countM] ?? {})
+        .entries
+        .fold(0.0, (prev, next) => prev + (next.value ?? 0))
+        .toInt();
+
+    final countF = (data.stats[Indicator.countF] ?? {})
+        .entries
+        .fold(0.0, (prev, next) => prev + (next.value ?? 0))
+        .toInt();
+
+    final medals = (data.stats[Indicator.medals] ?? {})
+        .entries
+        .where((e) => e.value != null)
+        .toList()
+        .sorted((a, b) => (a.value ?? 0).toInt() - (b.value ?? 0).toInt())
+        .take(3);
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -36,29 +50,39 @@ class StudentsCount extends StatelessWidget {
               ),
               RichText(
                   text: TextSpan(children: [
-                TextSpan(text: '$count', style: context.headlineLarge),
+                TextSpan(
+                    text: '${countF + countM}', style: context.headlineLarge),
                 TextSpan(text: ' человек', style: context.body)
               ])),
               Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      children: [
-                        Image.asset('assets/more/boy.png'),
-                        Text(
-                          '1\nчел.',
-                          style: context.body,
-                          textAlign: TextAlign.center,
-                        )
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            'assets/more/boy.png',
+                            height: 85,
+                          ),
+                          Text(
+                            '$countM\nчел.',
+                            style: context.body,
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
                     child: Column(
                       children: [
-                        Image.asset('assets/more/girl.png'),
+                        Image.asset(
+                          'assets/more/girl.png',
+                          height: 85,
+                        ),
                         Text(
-                          '1\nчел.',
+                          '$countF\nчел.',
                           textAlign: TextAlign.center,
                           style: context.body,
                         )
@@ -78,7 +102,7 @@ class StudentsCount extends StatelessWidget {
                 Image.asset('assets/icons/medal.png'),
                 Padding(
                   padding: const EdgeInsets.only(left: 36.0),
-                  child: Text('УДОСТОЕНЫ МЕДАЛИ\nЗА ОСОБЫЕ УСПЕХИ\nВ УЧЕНИИ',
+                  child: Text('УДОСТОЕНЫ МЕДАЛИ\n«ЗА ОСОБЫЕ\n УСПЕХИ В УЧЕНИИ»',
                       textAlign: TextAlign.right,
                       style: context.body.copyWith(
                           color: AppColors.secondary, fontSize: 14.0)),
@@ -91,6 +115,36 @@ class StudentsCount extends StatelessWidget {
                 'ТОП 3',
                 style: context.body.copyWith(color: AppColors.secondary),
               ),
+            ),
+            Column(
+              children: [
+                for (final medal in medals)
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          medal.key.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(children: [
+                                TextSpan(
+                                  text: '${medal.value}',
+                                  style: context.headlineMedium,
+                                ),
+                                const TextSpan(text: '\nчел')
+                              ])),
+                        ),
+                      )
+                    ],
+                  )
+              ],
             )
           ])
         ],
@@ -137,43 +191,45 @@ class _MaxAdmission extends StatelessWidget {
               if (maximum?.key.imgUrl != null)
                 CircleAvatar(
                   backgroundImage: NetworkImage(maximum!.key.imgUrl),
-                  radius: 48.0,
+                  radius: 36.0,
                 )
             ],
           ),
         ),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                maxF?.value.toString().replaceAll('.', ',') ?? '0',
-                style: context.headlineMedium,
+        if (maxF?.value != null)
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  maxF?.value.toString().replaceAll('.', ',') ?? '0',
+                  style: context.headlineMedium,
+                ),
               ),
-            ),
-            const Expanded(
-              child: Text(
-                'человек/место\nдевочки',
-                textAlign: TextAlign.right,
+              const Expanded(
+                child: Text(
+                  'человек/место\nдевочки',
+                  textAlign: TextAlign.right,
+                ),
+              )
+            ],
+          ),
+        if (maxM?.value != null)
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  maxM?.value.toString().replaceAll('.', ',') ?? '0',
+                  style: context.headlineMedium,
+                ),
               ),
-            )
-          ],
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                maxM?.value.toString().replaceAll('.', ',') ?? '0',
-                style: context.headlineMedium,
-              ),
-            ),
-            const Expanded(
-              child: Text(
-                'человек/место\nмальчики',
-                textAlign: TextAlign.right,
-              ),
-            )
-          ],
-        ),
+              const Expanded(
+                child: Text(
+                  'человек/место\nмальчики',
+                  textAlign: TextAlign.right,
+                ),
+              )
+            ],
+          ),
       ],
     );
   }

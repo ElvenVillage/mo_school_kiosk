@@ -13,7 +13,6 @@ import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 import 'package:mo_school_kiosk/widgets/top_five_card.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'content/main_structure.dart';
 import 'content/students_count.dart';
@@ -21,25 +20,19 @@ import 'content/students_count.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru_RU');
-  await windowManager.ensureInitialized();
-
-  WindowOptions windowOptions = const WindowOptions(fullScreen: true);
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
 
   runApp(const App());
 }
 
 class _SectionCard extends StatelessWidget {
   const _SectionCard(this.title, this.value, this.backgroundAsset, this.child,
-      {this.onTap});
+      {this.onTap, this.details = false});
 
   final String? title;
   final String? value;
   final String backgroundAsset;
   final void Function()? onTap;
+  final bool details;
 
   final Widget child;
 
@@ -58,36 +51,40 @@ class _SectionCard extends StatelessWidget {
             Positioned.fill(
               child: Column(
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: Text(title ?? '',
-                                  maxLines: null,
-                                  style: context.headlineLarge.copyWith(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold))),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(value ?? '',
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(title ?? '',
+                                maxLines: null,
                                 style: context.headlineLarge.copyWith(
-                                    fontSize: 46.0,
-                                    fontWeight: FontWeight.bold)),
-                          )
-                        ],
-                      ),
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold))),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text((value ?? '').replaceAll('.', ','),
+                              style: context.headlineLarge.copyWith(
+                                fontSize: 70.0,
+                              )),
+                        )
+                      ],
                     ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    color: AppColors.secondary.withAlpha(200),
+                    child: child,
                   ),
                   Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      color: AppColors.secondary.withAlpha(200),
-                      child: child,
-                    ),
-                  ),
-                  const Spacer()
+                    child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(details ? 'подробнее' : '',
+                              style: context.headlineMedium),
+                        )),
+                  )
                 ],
               ),
             )
@@ -233,11 +230,20 @@ class _TopThreeList extends StatelessWidget {
     return Column(
       children: [
         for (final school in sorted)
-          RichText(
-              text: TextSpan(style: context.body, children: [
-            TextSpan(text: school.value.toString()),
-            TextSpan(text: school.key.name),
-          ]))
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RichText(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(style: context.body, children: [
+                  TextSpan(
+                      text:
+                          '${(school.value ?? 0) / 100} '.replaceAll('.', ','),
+                      style: context.headlineMedium
+                          .copyWith(fontWeight: FontWeight.bold)),
+                  TextSpan(text: school.key.name, style: context.body),
+                ])),
+          )
       ],
     );
   }
@@ -288,6 +294,7 @@ class MainStats extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(IntensitySchool.route());
                 },
+                details: true,
               ),
             ),
             Flexible(
@@ -301,6 +308,7 @@ class MainStats extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(KomplektPage.route());
                 },
+                details: true,
               ),
             )
           ],
@@ -344,7 +352,7 @@ class MainStats extends StatelessWidget {
                 null,
                 'newsfeed.png',
                 _wrap(
-                  Text('НОВОСТИ', style: context.headlineLarge),
+                  Text('НОВОСТИ\n', style: context.headlineLarge),
                 ),
                 onTap: () {
                   Navigator.of(context).push(NewsScreen.route());
