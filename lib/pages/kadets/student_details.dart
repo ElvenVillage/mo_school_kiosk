@@ -77,12 +77,16 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
                             ]),
                             _dataRow('Место рождения',
                                 data.info.first.birthplace, context),
-                            _dataRow('Дата рождения', data.info.first.birthdate,
+                            _dataRow(
+                                'Дата рождения',
+                                data.info.first.birthdate.substring(0, 10),
                                 context),
                             _dataRow('Военный округ',
                                 data.info.first.militaryDistrict, context),
                             _dataRow(
-                                'Зачислен', data.info.first.enterDate, context),
+                                'Зачислен',
+                                data.info.first.enterDate.substring(0, 10),
+                                context),
                             _dataRow('Отец', data.info.first.father, context),
                             _dataRow('Мать', data.info.first.mother, context)
                           ]),
