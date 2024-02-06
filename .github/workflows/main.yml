@@ -9,7 +9,7 @@ jobs:
 
   build:
   
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
           flutter build linux
           cp -a build/linux/x64/release/bundle/. kiosk-dovuz/bin/
           mv kiosk-dovuz/bin/mo_school_kiosk kiosk-dovuz/bin/kiosk-dovuz
-          dpkg-deb --build kiosk-dovuz
+          dpkg-deb  -Zgzip --build kiosk-dovuz
           
 
       - name: Upload a Build Artifact

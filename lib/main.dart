@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_school.dart';
@@ -17,8 +18,18 @@ import 'package:provider/provider.dart';
 import 'content/main_structure.dart';
 import 'content/students_count.dart';
 
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await initializeDateFormatting('ru_RU');
 
   runApp(const App());
@@ -104,6 +115,7 @@ class App extends StatelessWidget {
       lazy: false,
       create: (context) => StatsProvider()..load(),
       child: MaterialApp(
+        scrollBehavior: CustomScrollBehavior(),
         theme: ThemeData.dark().copyWith(
             progressIndicatorTheme:
                 const ProgressIndicatorThemeData(color: Colors.white),
