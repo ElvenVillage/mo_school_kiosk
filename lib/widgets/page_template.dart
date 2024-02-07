@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/style.dart';
 
-import 'back_button.dart';
 import 'lms_appbar.dart';
 
 class PageTemplate extends StatelessWidget {
@@ -23,7 +22,6 @@ class PageTemplate extends StatelessWidget {
     return Stack(
       children: [
         Scaffold(
-          floatingActionButton: const BackFloatingButton(),
           appBar: LmsAppBar(title: title),
           body: Container(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),

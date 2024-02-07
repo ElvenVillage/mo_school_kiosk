@@ -11,6 +11,7 @@ import 'package:mo_school_kiosk/providers/data_provider.dart';
 
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/back_button.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 import 'package:mo_school_kiosk/widgets/top_five_card.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +34,32 @@ void main() async {
   await initializeDateFormatting('ru_RU');
 
   runApp(const App());
+}
+
+class NavigatorListener extends ChangeNotifier {
+  var depth = 0;
+  void update(int event) {
+    depth += event;
+    notifyListeners();
+  }
+}
+
+class MyNavigatorObserver extends RouteObserver<PageRoute> {
+  final NavigatorListener listener;
+
+  MyNavigatorObserver(this.listener);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    listener.update(-1);
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    listener.update(1);
+  }
 }
 
 class _SectionCard extends StatelessWidget {
@@ -106,91 +133,116 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  final _navigator = GlobalKey<NavigatorState>();
+  final _listener = NavigatorListener();
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       lazy: false,
       create: (context) => StatsProvider()..load(),
-      child: MaterialApp(
-        scrollBehavior: CustomScrollBehavior(),
-        theme: ThemeData.dark().copyWith(
-            progressIndicatorTheme:
-                const ProgressIndicatorThemeData(color: Colors.white),
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary)),
-        themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          appBar: const LmsAppBar(
-              title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
-          body: Builder(builder: (context) {
-            return Container(
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/background.png'),
-                      fit: BoxFit.cover)),
-              child: Column(
-                children: [
-                  const Expanded(
-                    flex: 4,
-                    child: Row(
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Stack(
+          children: [
+            MaterialApp(
+              navigatorObservers: [MyNavigatorObserver(_listener)],
+              navigatorKey: _navigator,
+              scrollBehavior: CustomScrollBehavior(),
+              theme: ThemeData.dark().copyWith(
+                  hoverColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  progressIndicatorTheme:
+                      const ProgressIndicatorThemeData(color: Colors.white),
+                  colorScheme:
+                      ColorScheme.fromSeed(seedColor: AppColors.primary)),
+              themeMode: ThemeMode.dark,
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                appBar: const LmsAppBar(
+                    title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
+                body: Builder(builder: (context) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/background.png'),
+                            fit: BoxFit.cover)),
+                    child: Column(
                       children: [
-                        Expanded(child: MainStructure()),
-                        Expanded(child: StudentsCount()),
-                        Expanded(
+                        const Expanded(
                           flex: 4,
-                          child: MainStats(),
+                          child: Row(
+                            children: [
+                              Expanded(child: MainStructure()),
+                              Expanded(child: StudentsCount()),
+                              Expanded(
+                                flex: 4,
+                                child: MainStats(),
+                              )
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Divider(
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Image.asset('assets/top5.png'),
+                              ),
+                              const Expanded(
+                                child: _TopFiveList(
+                                  caption: 'СРЕДНИЙ БАЛЛ',
+                                  indicator: Indicator.averageGrade,
+                                  maxValue: 5.0,
+                                ),
+                              ),
+                              _gap(),
+                              const Expanded(
+                                child: _TopFiveList(
+                                  caption:
+                                      'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
+                                  indicator: Indicator.plan,
+                                  maxValue: 100.0,
+                                  add: '% ',
+                                ),
+                              ),
+                              _gap(),
+                              const Expanded(
+                                child: _TopFiveList(
+                                  caption:
+                                      'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
+                                  indicator: Indicator.events,
+                                ),
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Divider(
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Image.asset('assets/top5.png'),
-                        ),
-                        const Expanded(
-                          child: _TopFiveList(
-                            caption: 'СРЕДНИЙ БАЛЛ',
-                            indicator: Indicator.averageGrade,
-                            maxValue: 5.0,
-                          ),
-                        ),
-                        _gap(),
-                        const Expanded(
-                          child: _TopFiveList(
-                            caption:
-                                'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
-                            indicator: Indicator.plan,
-                            maxValue: 100.0,
-                            add: '% ',
-                          ),
-                        ),
-                        _gap(),
-                        const Expanded(
-                          child: _TopFiveList(
-                            caption:
-                                'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
-                            indicator: Indicator.events,
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                  );
+                }),
               ),
-            );
-          }),
+            ),
+            Positioned(
+                bottom: 0,
+                right: 0,
+                child: BackFloatingButton(_navigator, _listener))
+          ],
         ),
       ),
     );

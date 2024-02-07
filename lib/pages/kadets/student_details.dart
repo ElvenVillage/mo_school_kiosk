@@ -5,7 +5,6 @@ import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/api/student.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
-import 'package:mo_school_kiosk/widgets/back_button.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 
 class StudentDetailsPage extends StatefulWidget {
@@ -28,7 +27,6 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: const BackFloatingButton(),
       appBar: const LmsAppBar(title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ'),
       body: Container(
         decoration: const BoxDecoration(
