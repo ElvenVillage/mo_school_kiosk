@@ -83,10 +83,11 @@ class KomplektCard extends StatelessWidget {
                             ],
                           ),
                           const Spacer(flex: 3),
-                          Text(
-                            '${komplekt.value}%',
-                            style: context.headlineLarge,
-                          ),
+                          if (komplekt.value > 0.0)
+                            Text(
+                              '${komplekt.value}%',
+                              style: context.headlineLarge,
+                            ),
                           const Spacer(),
                         ],
                       ),

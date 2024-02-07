@@ -56,7 +56,7 @@ class IntensityCourse extends StatelessWidget {
                 childAspectRatio: 10,
                 children: [
                   for (final subject in data.entries.sorted((a, b) =>
-                      (num.parse(b.value) - num.parse(a.value)).toInt()))
+                      (num.parse(b.value) - num.parse(a.value)).sign.toInt()))
                     InkWell(
                       onTap: () {
                         Navigator.of(context).push(IntensityTeacher.route(

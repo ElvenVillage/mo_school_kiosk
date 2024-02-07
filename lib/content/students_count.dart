@@ -26,7 +26,7 @@ class StudentsCount extends StatelessWidget {
         .entries
         .where((e) => e.value != null)
         .toList()
-        .sorted((a, b) => (a.value ?? 0).toInt() - (b.value ?? 0).toInt())
+        .sorted(numCompare)
         .take(3);
 
     return Padding(

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -51,28 +52,47 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
-  Future<List<RssItem>>? _future;
+  SharedPreferences? _prefs;
 
-  Future<List<RssItem>> _fetchNews() async {
+  Stream<List<RssItem>> _fetchNews() async* {
+    _prefs ??= await SharedPreferences.getInstance();
+
+    final cachedResult = <RssItem>[];
+
+    final savedSchools = NewsScreen.rssUrls.values;
+    for (final key in savedSchools) {
+      final data = _prefs?.getString(key);
+      if (data != null) {
+        cachedResult.addAll(RssFeed.parse(data).items);
+      }
+    }
+
+    if (cachedResult.isNotEmpty) {
+      yield cachedResult..sort((a, b) => b.date.compareTo(a.date));
+    }
+
     final dio = Dio(BaseOptions(responseType: ResponseType.plain));
+
     final result = <RssItem>[];
 
     for (final school in NewsScreen.rssUrls.values) {
       try {
-        result.addAll(RssFeed.parse((await dio.get(school)).data).items);
+        final response = (await dio.get(school)).data;
+        result.addAll(RssFeed.parse(response).items);
+        await _prefs?.setString(school, response.toString());
       } catch (_) {}
     }
-    return result..sort((a, b) => b.date.compareTo(a.date));
+    yield result..sort((a, b) => b.date.compareTo(a.date));
   }
 
   @override
   Widget build(BuildContext context) {
     return PageTemplate(
         title: 'НОВОСТИ',
-        body: FutureBuilder(
-          future: _future ??= _fetchNews(),
+        body: StreamBuilder(
+          stream: _fetchNews(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.data?.isNotEmpty ?? false) {
               final data = snapshot.data!;
               return GridView.count(
                 crossAxisCount: 3,

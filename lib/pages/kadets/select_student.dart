@@ -69,7 +69,10 @@ class SelectStudentPage extends StatelessWidget {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(student.fio),
+                                    child: Text(
+                                      student.fio,
+                                      style: context.body,
+                                    ),
                                   ),
                                 ],
                               ),

@@ -27,97 +27,92 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: const LmsAppBar(title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ'),
-      body: Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/background2.png'),
-                fit: BoxFit.cover)),
-        child: Stack(
-          children: [
-            Column(children: [
-              Expanded(
-                  child: FutureBuilder(
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final data = snapshot.data!.answer.data;
+      body: Stack(
+        children: [
+          Column(children: [
+            Expanded(
+                child: FutureBuilder(
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final data = snapshot.data!.answer.data;
 
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Column(children: [
-                            Row(children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Image.network(widget.student
-                                      .photoUrl('nnz', 'Sonyk12345678')),
-                                ),
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Column(children: [
+                          Row(children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Image.network(widget.student
+                                    .photoUrl('nnz', 'Sonyk12345678')),
                               ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 64.0,
-                                        backgroundImage:
-                                            NetworkImage(widget.school.imgUrl)),
-                                    const SizedBox(
-                                      height: 72.0,
-                                    ),
-                                    Text(
-                                      widget.student.fio,
-                                      style: context.headlineMedium,
-                                    )
-                                  ],
-                                ),
-                              )
-                            ]),
-                            _dataRow('Место рождения',
-                                data.info.first.birthplace, context),
-                            _dataRow(
-                                'Дата рождения',
-                                data.info.first.birthdate.substring(0, 10),
-                                context),
-                            _dataRow('Военный округ',
-                                data.info.first.militaryDistrict, context),
-                            _dataRow(
-                                'Зачислен',
-                                data.info.first.enterDate.substring(0, 10),
-                                context),
-                            _dataRow('Отец', data.info.first.father, context),
-                            _dataRow('Мать', data.info.first.mother, context)
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 64.0,
+                                      backgroundImage:
+                                          NetworkImage(widget.school.imgUrl)),
+                                  const SizedBox(
+                                    height: 72.0,
+                                  ),
+                                  Text(
+                                    widget.student.fio,
+                                    style: context.headlineMedium,
+                                  )
+                                ],
+                              ),
+                            )
                           ]),
-                        ),
-                        Expanded(
-                            flex: 2,
-                            child: _GradesCard(
-                              data: data,
-                              key: Key(data.info.first.id),
-                            )),
-                      ],
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                          _dataRow('Место рождения', data.info.first.birthplace,
+                              context),
+                          _dataRow(
+                              'Дата рождения',
+                              data.info.first.birthdate.substring(0, 10),
+                              context),
+                          _dataRow('Военный округ',
+                              data.info.first.militaryDistrict, context),
+                          _dataRow(
+                              'Зачислен',
+                              data.info.first.enterDate.substring(0, 10),
+                              context),
+                          _dataRow('Отец', data.info.first.father, context),
+                          _dataRow('Мать', data.info.first.mother, context)
+                        ]),
+                      ),
+                      Expanded(
+                          flex: 2,
+                          child: _GradesCard(
+                            data: data,
+                            key: Key(data.info.first.id),
+                          )),
+                    ],
                   );
-                },
-                future: _future ??= client.getStudentDetails(
-                    widget.school.id, widget.student.id),
-              )),
-            ]),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0, left: 20),
-                child: Text(
-                  widget.school.name,
-                  style: context.headlineLarge,
-                ),
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+              future: _future ??=
+                  client.getStudentDetails(widget.school.id, widget.student.id),
+            )),
+          ]),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20.0, left: 20),
+              child: Text(
+                widget.school.name,
+                style: context.headlineLarge,
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

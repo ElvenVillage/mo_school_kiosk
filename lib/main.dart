@@ -166,6 +166,7 @@ class _AppState extends State<App> {
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
                   indicatorColor: Colors.transparent,
+                  platform: TargetPlatform.macOS,
                   highlightColor: Colors.transparent,
                   splashFactory: NoSplash.splashFactory,
                   progressIndicatorTheme:
@@ -245,6 +246,21 @@ class _AppState extends State<App> {
                 }),
               ),
             ),
+            Builder(builder: (context) {
+              final data = context.watch<StatsProvider>().stats;
+              if (data.isEmpty) {
+                return Container(
+                  color: Colors.grey.withAlpha(100),
+                  width: double.maxFinite,
+                  height: double.maxFinite,
+                  child: const Center(
+                      child: CircularProgressIndicator(
+                    color: Colors.white,
+                  )),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
             Positioned(
                 bottom: 0,
                 right: 0,
