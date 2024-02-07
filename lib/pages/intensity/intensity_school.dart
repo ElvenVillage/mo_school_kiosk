@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_course.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
@@ -14,6 +15,7 @@ class IntensitySchool extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<StatsProvider>().stats[Indicator.intensity]!;
+    final sorted = data.entries.sorted(numCompare);
 
     return PageTemplate(
         title: 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
@@ -21,14 +23,16 @@ class IntensitySchool extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 50,
           mainAxisSpacing: 50,
-          childAspectRatio: 8,
+          childAspectRatio: 20,
           children: [
-            for (final school in data.entries)
+            for (final school in sorted)
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(IntensityCourse.route(school.key));
                 },
                 child: RichText(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   text: TextSpan(
                       text: '${school.value}% ',
                       style: context.headlineLarge,

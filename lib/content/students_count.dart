@@ -179,13 +179,14 @@ class _MaxAdmission extends StatelessWidget {
           maxLines: 1,
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   maximum?.key.name ?? '',
                   maxLines: null,
+                  style: context.body,
                 ),
               ),
               if (maximum?.key.imgUrl != null)

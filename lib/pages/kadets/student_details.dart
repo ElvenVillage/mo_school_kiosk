@@ -183,13 +183,13 @@ class _GradesCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           subj.subject,
-                          style: context.body,
+                          style: context.headlineMedium,
                         ),
                       ),
                       Expanded(
                         child: Text(
                           subj.grades.split(',').join(' '),
-                          style: context.body,
+                          style: context.headlineMedium,
                         ),
                       )
                     ],

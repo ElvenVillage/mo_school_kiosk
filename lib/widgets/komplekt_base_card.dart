@@ -52,10 +52,19 @@ class KomplektCard extends StatelessWidget {
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      db.name,
-                      style: context.body
-                          .copyWith(decoration: TextDecoration.underline),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 40.0),
+                            child: Text(
+                              db.name,
+                              style: context.body.copyWith(
+                                  decoration: TextDecoration.underline),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
@@ -73,7 +82,7 @@ class KomplektCard extends StatelessWidget {
                                   'высшей категории', context),
                             ],
                           ),
-                          const Spacer(),
+                          const Spacer(flex: 3),
                           Text(
                             '${komplekt.value}%',
                             style: context.headlineLarge,

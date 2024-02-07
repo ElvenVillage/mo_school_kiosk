@@ -14,13 +14,14 @@ class KomplektPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<StatsProvider>();
-    final reports = data.reports.entries;
 
     final [totalTeachers, firstCat, hightCat] = [
       data.getReportData(ReportIndicator.totalTeachers),
       data.getReportData(ReportIndicator.firstCat),
       data.getReportData(ReportIndicator.highCat),
     ];
+    final val = data.stats[Indicator.komplekt]!;
+    final valSorted = val.entries.sorted(numCompare);
 
     return PageTemplate(
         title: 'УКОМПЛЕКТОВАННОСТЬ ПЕДРАБОТНИКАМИ',
@@ -29,15 +30,18 @@ class KomplektPage extends StatelessWidget {
             shrinkWrap: true,
             crossAxisSpacing: 50,
             childAspectRatio: 5,
-            children: reports.mapIndexed((idx, db) {
+            children: valSorted.mapIndexed((idx, db) {
               return Row(
                 children: [
                   if (idx.isEven) const Spacer(),
                   Expanded(
                     flex: 4,
                     child: KomplektCard(
-                      komplekt: KomplektModel(totalTeachers[db.key],
-                          firstCat[db.key], hightCat[db.key], 0),
+                      komplekt: KomplektModel(
+                          totalTeachers[db.key],
+                          firstCat[db.key],
+                          hightCat[db.key],
+                          val[db.key]?.toDouble() ?? 0.0),
                       db: db.key,
                     ),
                   ),

@@ -384,12 +384,8 @@ class _LessonCard extends StatelessWidget {
     });
   }
 
-  Future<dynamic> _showLessonDialog(
-      BuildContext context,
-      List<LessonData> lesson,
-      List<TeacherData> teachers,
-      List<RoomData> rooms,
-      PeriodData periodData) {
+  Future<void> _showLessonDialog(BuildContext context, List<LessonData> lesson,
+      List<TeacherData> teachers, List<RoomData> rooms, PeriodData periodData) {
     return showDialog(
         context: context,
         builder: (_) {
@@ -406,7 +402,7 @@ class _LessonCard extends StatelessWidget {
                   return ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 900),
                     child: Card(
-                      color: Colors.grey,
+                      color: AppColors.darkGreen,
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
                         child: Column(

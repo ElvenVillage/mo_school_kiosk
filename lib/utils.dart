@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 
-int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) =>
-    ((a.value ?? 0) - (b.value ?? 0)).toInt();
+int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
+  return ((b.value ?? 0.0) - (a.value ?? 0.0)).sign.toInt();
+}
 
 Route createRoute(Widget Function(BuildContext context) builder) {
   return PageRouteBuilder(

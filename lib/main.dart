@@ -163,6 +163,7 @@ class App extends StatelessWidget {
                           child: _TopFiveList(
                             caption: 'СРЕДНИЙ БАЛЛ',
                             indicator: Indicator.averageGrade,
+                            maxValue: 5.0,
                           ),
                         ),
                         _gap(),
@@ -171,6 +172,7 @@ class App extends StatelessWidget {
                             caption:
                                 'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
                             indicator: Indicator.plan,
+                            maxValue: 100.0,
                             add: '% ',
                           ),
                         ),
@@ -205,12 +207,17 @@ class App extends StatelessWidget {
 }
 
 class _TopFiveList extends StatelessWidget {
-  const _TopFiveList(
-      {required this.caption, required this.indicator, this.add = ''});
+  const _TopFiveList({
+    required this.caption,
+    required this.indicator,
+    this.add = '',
+    this.maxValue,
+  });
 
   final String caption;
   final Indicator indicator;
   final String add;
+  final double? maxValue;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +230,7 @@ class _TopFiveList extends StatelessWidget {
         for (final school in sorted)
           (
             title: school.key.name,
-            maxValue: 29,
+            maxValue: maxValue ?? sorted.first.value!,
             value: school.value ?? 0,
             add: add
           ),
@@ -246,17 +253,25 @@ class _TopThreeList extends StatelessWidget {
         for (final school in sorted)
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: RichText(
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(style: context.body, children: [
-                  TextSpan(
-                      text:
-                          '${(school.value ?? 0) / 100} '.replaceAll('.', ','),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                      '${((school.value ?? 0.0) / 100).toStringAsFixed(2)} '
+                          .replaceAll('.', ','),
                       style: context.headlineMedium
                           .copyWith(fontWeight: FontWeight.bold)),
-                  TextSpan(text: school.key.name, style: context.body),
-                ])),
+                ),
+                Expanded(
+                    flex: 6,
+                    child: Text(
+                      school.key.name,
+                      style: context.body,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ))
+              ],
+            ),
           )
       ],
     );
@@ -300,7 +315,7 @@ class MainStats extends StatelessWidget {
             Flexible(
               child: _SectionCard(
                 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
-                avgIntensity.toString(),
+                avgIntensity.toStringAsFixed(1),
                 'intensity.png',
                 const _TopThreeList(
                   indicator: Indicator.intensity,
