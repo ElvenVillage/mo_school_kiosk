@@ -22,13 +22,10 @@ class PageTemplate extends StatelessWidget {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: Colors.transparent,
           appBar: LmsAppBar(title: title),
           body: Container(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/background2.png'),
-                    fit: BoxFit.cover)),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               if (subtitle != null)

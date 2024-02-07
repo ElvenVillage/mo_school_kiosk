@@ -19,7 +19,7 @@ import 'package:provider/provider.dart';
 import 'content/main_structure.dart';
 import 'content/students_count.dart';
 
-class CustomScrollBehavior extends MaterialScrollBehavior {
+class CustomScrollBehavior extends ScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -153,6 +153,11 @@ class _AppState extends State<App> {
         textDirection: TextDirection.ltr,
         child: Stack(
           children: [
+            Positioned.fill(
+                child: Image.asset(
+              'assets/background2.png',
+              fit: BoxFit.cover,
+            )),
             MaterialApp(
               navigatorObservers: [MyNavigatorObserver(_listener)],
               navigatorKey: _navigator,
@@ -160,7 +165,9 @@ class _AppState extends State<App> {
               theme: ThemeData.dark().copyWith(
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
+                  indicatorColor: Colors.transparent,
                   highlightColor: Colors.transparent,
+                  splashFactory: NoSplash.splashFactory,
                   progressIndicatorTheme:
                       const ProgressIndicatorThemeData(color: Colors.white),
                   colorScheme:

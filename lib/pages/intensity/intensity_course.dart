@@ -64,15 +64,22 @@ class IntensityCourse extends StatelessWidget {
                       },
                       child: Row(
                         children: [
-                          RichText(
-                              text: TextSpan(
-                                  text: '${subject.value}% ',
-                                  children: [
-                                    TextSpan(
-                                        text: subject.key.$1,
-                                        style: context.headlineMedium)
-                                  ],
-                                  style: context.headlineLarge))
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20.0),
+                              child: RichText(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  text: TextSpan(
+                                      text: '${subject.value}% ',
+                                      children: [
+                                        TextSpan(
+                                            text: subject.key.$1,
+                                            style: context.headlineMedium)
+                                      ],
+                                      style: context.headlineLarge)),
+                            ),
+                          )
                         ],
                       ),
                     )
