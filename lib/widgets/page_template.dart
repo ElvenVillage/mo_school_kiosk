@@ -25,6 +25,10 @@ class PageTemplate extends StatelessWidget {
           backgroundColor: Colors.transparent,
           appBar: LmsAppBar(title: title),
           body: Container(
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/background2.png'),
+                    fit: BoxFit.cover)),
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

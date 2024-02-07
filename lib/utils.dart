@@ -8,10 +8,15 @@ int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
 
 Route createRoute(Widget Function(BuildContext context) builder) {
   return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (context, _, __) => builder(context),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(
-        opacity: animation,
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      final tween = Tween(begin: begin, end: end);
+      final offsetAnimation = animation.drive(tween);
+      return SlideTransition(
+        position: offsetAnimation,
         child: child,
       );
     },

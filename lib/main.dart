@@ -153,11 +153,6 @@ class _AppState extends State<App> {
         textDirection: TextDirection.ltr,
         child: Stack(
           children: [
-            Positioned.fill(
-                child: Image.asset(
-              'assets/background2.png',
-              fit: BoxFit.cover,
-            )),
             MaterialApp(
               navigatorObservers: [MyNavigatorObserver(_listener)],
               navigatorKey: _navigator,
