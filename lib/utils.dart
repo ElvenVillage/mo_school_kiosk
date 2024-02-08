@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/style.dart';
 
 int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
   return ((b.value ?? 0.0) - (a.value ?? 0.0)).sign.toInt();
@@ -8,7 +9,8 @@ int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
 
 Route createRoute(Widget Function(BuildContext context) builder) {
   return PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, _, __) => builder(context),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
@@ -37,4 +39,61 @@ extension TimeOfDayFormat on TimeOfDay {
 extension ScheduleDataFormat on DateTime {
   static final _format = DateFormat.yMMMEd('ru_RU');
   String get scheduleDate => _format.format(this);
+}
+
+class ReloadableFutureBuilder<T> extends StatefulWidget {
+  const ReloadableFutureBuilder(
+      {super.key, required this.future, required this.builder});
+
+  final Future<T> Function() future;
+  final Widget Function(T data) builder;
+
+  @override
+  State<ReloadableFutureBuilder> createState() =>
+      _ReloadableFutureBuilderState<T>();
+}
+
+class _ReloadableFutureBuilderState<T>
+    extends State<ReloadableFutureBuilder<T>> {
+  late Future<T> _future = widget.future();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<T>(
+      future: _future,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data as T;
+              final child = widget.builder(data);
+              return child;
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: MaterialButton(
+                    onPressed: () {
+                      setState(() {
+                        _future = widget.future();
+                      });
+                    },
+                    child: Text(
+                      'Не удалось загрузить данные. \nПовторить попытку',
+                      style: context.headlineMedium,
+                      textAlign: TextAlign.center,
+                    )),
+              );
+            }
+
+          default:
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
 }

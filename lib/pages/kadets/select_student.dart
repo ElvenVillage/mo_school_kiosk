@@ -44,48 +44,43 @@ class SelectStudentPage extends StatelessWidget {
               ],
             ),
             Expanded(
-              child: FutureBuilder(
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final students = snapshot.data!.answer.data;
-                    return GridView.count(
-                      crossAxisCount: 5,
-                      childAspectRatio: 3,
-                      children: [
-                        for (final student in students)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                  StudentDetailsPage.route(school, student));
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 64.0,
-                                    backgroundImage: NetworkImage(student
-                                        .photoUrl('nnz', 'Sonyk12345678')),
+              child: ReloadableFutureBuilder<StudentsListResponse>(
+                builder: (data) {
+                  final students = data.answer.data;
+                  return GridView.count(
+                    crossAxisCount: 5,
+                    childAspectRatio: 3,
+                    children: [
+                      for (final student in students)
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                                StudentDetailsPage.route(school, student));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 64.0,
+                                  backgroundImage: NetworkImage(
+                                      student.photoUrl('nnz', 'Sonyk12345678')),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    student.fio,
+                                    style: context.body,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      student.fio,
-                                      style: context.body,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          )
-                      ],
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                          ),
+                        )
+                    ],
                   );
                 },
-                future: client.getStudents(school.id, group.id),
+                future: () => client.getStudents(school.id, group.id),
               ),
             ),
           ],

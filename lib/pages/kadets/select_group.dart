@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
+import 'package:mo_school_kiosk/api/groups.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/pages/kadets/select_student.dart';
 import 'package:mo_school_kiosk/utils.dart';
@@ -25,24 +26,19 @@ class SelectGroupPage extends StatelessWidget {
             child: Hero(tag: school.dbName, child: BaseCard(db: school)),
           ),
           Expanded(
-            child: FutureBuilder(
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final groups = snapshot.data!.answer.data;
-                  return GroupGrid(
-                    groups: groups,
-                    school: school,
-                    onTap: (group) {
-                      Navigator.of(context)
-                          .push(SelectStudentPage.route(school, group));
-                    },
-                  );
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
+            child: ReloadableFutureBuilder<GroupsResponse>(
+              builder: (data) {
+                final groups = data.answer.data;
+                return GroupGrid(
+                  groups: groups,
+                  school: school,
+                  onTap: (group) {
+                    Navigator.of(context)
+                        .push(SelectStudentPage.route(school, group));
+                  },
                 );
               },
-              future: client.getGroups(school.id),
+              future: () => client.getGroups(school.id),
             ),
           ),
         ]));

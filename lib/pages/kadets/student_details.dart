@@ -7,7 +7,7 @@ import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 
-class StudentDetailsPage extends StatefulWidget {
+class StudentDetailsPage extends StatelessWidget {
   const StudentDetailsPage(
       {super.key, required this.school, required this.student});
 
@@ -18,26 +18,22 @@ class StudentDetailsPage extends StatefulWidget {
       createRoute((_) => StudentDetailsPage(school: school, student: student));
 
   @override
-  State<StudentDetailsPage> createState() => _StudentDetailsPageState();
-}
-
-class _StudentDetailsPageState extends State<StudentDetailsPage> {
-  Future<StudentDetailsResponse>? _future;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: const LmsAppBar(title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ'),
-      body: Stack(
-        children: [
-          Column(children: [
-            Expanded(
-                child: FutureBuilder(
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final data = snapshot.data!.answer.data;
-
+      body: Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/background2.png'),
+                fit: BoxFit.cover)),
+        child: Stack(
+          children: [
+            Column(children: [
+              Expanded(
+                  child: ReloadableFutureBuilder<StudentDetailsResponse>(
+                builder: (response) {
+                  final data = response.answer.data;
                   return Row(
                     children: [
                       Expanded(
@@ -46,8 +42,8 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.all(24.0),
-                                child: Image.network(widget.student
-                                    .photoUrl('nnz', 'Sonyk12345678')),
+                                child: Image.network(
+                                    student.photoUrl('nnz', 'Sonyk12345678')),
                               ),
                             ),
                             Expanded(
@@ -57,12 +53,12 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
                                   CircleAvatar(
                                       radius: 64.0,
                                       backgroundImage:
-                                          NetworkImage(widget.school.imgUrl)),
+                                          NetworkImage(school.imgUrl)),
                                   const SizedBox(
                                     height: 72.0,
                                   ),
                                   Text(
-                                    widget.student.fio,
+                                    student.fio,
                                     style: context.headlineMedium,
                                   )
                                 ],
@@ -93,26 +89,22 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
                           )),
                     ],
                   );
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-              future: _future ??=
-                  client.getStudentDetails(widget.school.id, widget.student.id),
-            )),
-          ]),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 20),
-              child: Text(
-                widget.school.name,
-                style: context.headlineLarge,
+                },
+                future: () => client.getStudentDetails(school.id, student.id),
+              )),
+            ]),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0, left: 20),
+                child: Text(
+                  school.name,
+                  style: context.headlineLarge,
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

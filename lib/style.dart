@@ -7,7 +7,10 @@ class AppColors {
 }
 
 extension TextStyles on BuildContext {
-  TextStyle get headlineMedium => Theme.of(this).textTheme.headlineSmall!;
-  TextStyle get headlineLarge => Theme.of(this).textTheme.headlineLarge!;
-  TextStyle get body => Theme.of(this).textTheme.bodyLarge!;
+  TextStyle get headlineMedium =>
+      Theme.of(this).textTheme.headlineSmall!.copyWith(color: Colors.white);
+  TextStyle get headlineLarge =>
+      Theme.of(this).textTheme.headlineLarge!.copyWith(color: Colors.white);
+  TextStyle get body =>
+      Theme.of(this).textTheme.bodyLarge!.copyWith(color: Colors.white);
 }

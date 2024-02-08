@@ -6,6 +6,8 @@ import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 
+typedef _IntensityTeacher = Map<String, ({String fio, String id})>;
+
 class IntensityTeacher extends StatelessWidget {
   const IntensityTeacher({
     super.key,
@@ -18,7 +20,7 @@ class IntensityTeacher extends StatelessWidget {
   final String courseId;
   final String courseName;
 
-  Future<Map<String, ({String fio, String id})>> _load() async {
+  Future<_IntensityTeacher> _load() async {
     final data = await client.getStatsByTeachers(school.id, courseId);
     return data.answer.data.groupListsBy((e) => e.subValName).map(
         (key, value) =>
@@ -57,11 +59,9 @@ class IntensityTeacher extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: FutureBuilder(
-              future: _load(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return const Center();
-                final data = snapshot.data!;
+          child: ReloadableFutureBuilder<_IntensityTeacher>(
+              future: () => _load(),
+              builder: (data) {
                 return GridView.count(
                     crossAxisCount: 3,
                     childAspectRatio: 4,

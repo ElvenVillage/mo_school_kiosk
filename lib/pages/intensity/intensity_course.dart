@@ -8,12 +8,14 @@ import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 
+typedef _Intensity = Map<(String, String), String>;
+
 class IntensityCourse extends StatelessWidget {
   const IntensityCourse({super.key, required this.school});
 
   final School school;
 
-  Future<Map<(String, String), String>> _load() async {
+  Future<_Intensity> _load() async {
     final data = await client.getStatsForSchool(school.id);
     return data.answer.data
         .where((e) => e.indicatorKey == Indicator.intensitySubject.value)
@@ -42,15 +44,9 @@ class IntensityCourse extends StatelessWidget {
             Text(school.name, style: context.headlineLarge),
           ],
         ),
-        body: FutureBuilder(
-            future: _load(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              final data = snapshot.data!;
+        body: ReloadableFutureBuilder<_Intensity>(
+            future: () => _load(),
+            builder: (_Intensity data) {
               return GridView.count(
                 crossAxisCount: 3,
                 childAspectRatio: 10,
