@@ -1,7 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:collection/collection.dart';
 import 'package:dart_rss/dart_rss.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
@@ -182,21 +185,92 @@ class NewsDetailsScreen extends StatelessWidget {
   static Route route(RssItem item) =>
       createRoute((context) => NewsDetailsScreen(item));
 
+  Future<List<String>> _parseNewspage(String url) async {
+    final data = (await Dio().get(url)).data.toString();
+
+    final htmlDom = parse(data);
+    final figures = htmlDom.getElementsByClassName('b-preview-img');
+
+    final host = 'https://${Uri.parse(item.link!).host}';
+
+    return figures
+        .map((e) => host + (e.nodes[3].attributes['href'] ?? ''))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageTemplate(
         title: 'Новости',
-        body: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          if (item.enclosure?.url != null) Image.network(item.enclosure!.url!),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: HtmlWidget(
-                item.description ?? '',
-                textStyle: context.body,
-              ),
-            ),
-          ),
-        ]));
+        body: ReloadableFutureBuilder<List<String>>(
+            future: () => _parseNewspage(item.link!),
+            builder: (data) {
+              return SingleChildScrollView(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CarouselSlider(
+                        options: CarouselOptions(
+                            height: 400.0, viewportFraction: 0.3),
+                        items: data.mapIndexed((idx, url) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .push(GalleryPage.route(data, idx));
+                                },
+                                child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    child: Image.network(url)),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: HtmlWidget(
+                          item.description ?? '',
+                          textStyle: context.headlineMedium,
+                        ),
+                      ),
+                    ]),
+              );
+            }));
+  }
+}
+
+class GalleryPage extends StatelessWidget {
+  const GalleryPage(this.urls, this.idx, {super.key});
+
+  final List<String> urls;
+  final int idx;
+
+  static Route route(List<String> urls, int idx) =>
+      createRoute((context) => GalleryPage(urls, idx));
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CarouselSlider(
+        options: CarouselOptions(
+            initialPage: idx,
+            height: MediaQuery.of(context).size.height - kToolbarHeight,
+            viewportFraction: 1.0),
+        items: urls.mapIndexed((idx, url) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Image.network(url));
+            },
+          );
+        }).toList(),
+      ),
+    );
   }
 }

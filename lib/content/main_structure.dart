@@ -37,9 +37,9 @@ class MainStructure extends StatelessWidget {
   const MainStructure({super.key});
 
   final _structs = const [
-    _StructureModel('образовательные организаций', 'obrmo.png', 32),
+    _StructureModel('образовательные организаций', 'obrmo.png', 33),
     _StructureModel('президентских\nкадетских\nучилищ', 'pku.png', 7),
-    _StructureModel('суворовских\nвоенных\nучилищ', 'svu.png', 10),
+    _StructureModel('суворовских\nвоенных\nучилищ', 'svu.png', 11),
     _StructureModel(
         'Нахимовское военно-морское училище\n+4 филиала', 'nvmu.png', 1),
     _StructureModel('кадетских\nвоенных\nкорпусов', 'kvk.png', 6),
