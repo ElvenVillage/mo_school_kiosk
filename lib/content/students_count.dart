@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/base_card.dart';
 import 'package:provider/provider.dart';
 
 class StudentsCount extends StatelessWidget {
@@ -37,17 +38,19 @@ class StudentsCount extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'ЧИСЛЕННОСТЬ',
-              style: context.headlineLarge.copyWith(color: AppColors.secondary),
+              style: context.headlineLarge.copyWith(
+                color: AppColors.secondary,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.secondary,
+              ),
             ),
           ),
           Column(
             children: [
-              Text(
-                'Всего обучающихся',
-                style: context.body.copyWith(fontSize: 26.0),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-              ),
+              Text('Всего обучающихся',
+                  style: context.body.copyWith(fontSize: 26.0),
+                  textAlign: TextAlign.center,
+                  maxLines: 1),
               RichText(
                   text: TextSpan(children: [
                 TextSpan(
@@ -183,17 +186,25 @@ class _MaxAdmission extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  maximum?.key.name ?? '',
-                  maxLines: null,
-                  style: context.body,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    maximum?.key.name ?? '',
+                    maxLines: null,
+                    style: context.body,
+                  ),
                 ),
               ),
-              if (maximum?.key.imgUrl != null)
-                CircleAvatar(
-                  backgroundImage: NetworkImage(maximum!.key.imgUrl),
+              FutureBuilder(
+                future: maximum == null
+                    ? Future.value(null)
+                    : BaseCard.getBaseImage(maximum.key),
+                builder: (context, snapshot) => CircleAvatar(
+                  backgroundColor: Colors.white,
+                  backgroundImage: snapshot.data,
                   radius: 36.0,
-                )
+                ),
+              )
             ],
           ),
         ),

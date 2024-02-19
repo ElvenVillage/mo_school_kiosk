@@ -90,7 +90,7 @@ class _SectionCard extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -103,7 +103,7 @@ class _SectionCard extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: Text((value ?? '').replaceAll('.', ','),
                               style: context.headlineLarge.copyWith(
-                                fontSize: 70.0,
+                                fontSize: 85.0,
                               )),
                         )
                       ],
@@ -118,9 +118,12 @@ class _SectionCard extends StatelessWidget {
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.only(right: 24.0, bottom: 16.0),
                           child: Text(details ? 'подробнее' : '',
-                              style: context.headlineMedium),
+                              style: context.headlineMedium.copyWith(
+                                decoration: TextDecoration.underline,
+                              )),
                         )),
                   )
                 ],

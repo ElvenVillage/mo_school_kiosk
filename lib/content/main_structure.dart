@@ -60,8 +60,11 @@ class MainStructure extends StatelessWidget {
               padding: const EdgeInsets.only(left: 8.0, top: 12.0),
               child: Text(
                 'СТРУКТУРА',
-                style:
-                    context.headlineLarge.copyWith(color: AppColors.secondary),
+                style: context.headlineLarge.copyWith(
+                  color: AppColors.secondary,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.secondary,
+                ),
               ),
             ),
             ..._structs.map((e) => _StructureCard(e)).toList()

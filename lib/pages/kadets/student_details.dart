@@ -5,6 +5,7 @@ import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/api/student.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/base_card.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 
 class StudentDetailsPage extends StatelessWidget {
@@ -50,10 +51,14 @@ class StudentDetailsPage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CircleAvatar(
-                                      radius: 64.0,
-                                      backgroundImage:
-                                          NetworkImage(school.imgUrl)),
+                                  FutureBuilder(
+                                    future: BaseCard.getBaseImage(school),
+                                    builder: (context, snapshot) =>
+                                        CircleAvatar(
+                                            radius: 64.0,
+                                            backgroundColor: Colors.white,
+                                            foregroundImage: snapshot.data),
+                                  ),
                                   const SizedBox(
                                     height: 72.0,
                                   ),

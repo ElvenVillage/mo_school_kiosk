@@ -67,7 +67,7 @@ class _ScheduleGroupsPageState extends State<ScheduleGroupsPage> {
   Widget build(BuildContext context) {
     return PageTemplate(
         title: 'РАСПИСАНИЕ ЗАНЯТИЙ',
-        subtitle: 'Выберите учебную группу',
+        subtitle: 'Выберите класс',
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.all(8.0),

@@ -19,31 +19,37 @@ class IntensitySchool extends StatelessWidget {
 
     return PageTemplate(
         title: 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
-        body: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 50,
-          mainAxisSpacing: 50,
-          childAspectRatio: 20,
-          children: [
-            for (final school in sorted)
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(IntensityCourse.route(school.key));
-                },
-                child: RichText(
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                      text: '${school.value}% ',
-                      style: context.headlineLarge,
-                      children: [
-                        TextSpan(
-                            text: school.key.name,
-                            style: context.headlineMedium)
-                      ]),
-                ),
-              )
-          ],
+        body: SingleChildScrollView(
+          child: Wrap(
+            children: [
+              for (final school in sorted)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    height: 120,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(IntensityCourse.route(school.key));
+                      },
+                      child: RichText(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                            text: '${school.value}% ',
+                            style: context.headlineLarge,
+                            children: [
+                              TextSpan(
+                                  text: school.key.name,
+                                  style: context.headlineMedium)
+                            ]),
+                      ),
+                    ),
+                  ),
+                )
+            ],
+          ),
         ));
   }
 }

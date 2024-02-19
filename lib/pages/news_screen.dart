@@ -129,43 +129,51 @@ class _NewsCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(NewsDetailsScreen.route(item));
       },
-      child: Container(
-        decoration: BoxDecoration(
-            image: item.enclosure?.type != null
-                ? DecorationImage(
-                    image: NetworkImage(item.enclosure!.url!),
-                    fit: BoxFit.cover)
-                : null),
-        child: Column(
-          children: [
-            const Spacer(),
-            Expanded(
-                child: Container(
-                    color: AppColors.secondary.withAlpha(200),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              item.title ?? '',
-                              style: context.body,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(item.formattedDate),
-                          ),
-                        )
-                      ],
-                    ))),
-          ],
-        ),
-      ),
+      child: FutureBuilder(
+          future: NewsDetailsScreen.parseNewspage(item),
+          builder: (context, snapshot) {
+            return Container(
+              decoration: BoxDecoration(
+                  image: snapshot.data?.isNotEmpty ?? false
+                      ? DecorationImage(
+                          image: NetworkImage(snapshot.data!.first),
+                          fit: BoxFit.cover)
+                      : item.enclosure?.url != null
+                          ? DecorationImage(
+                              image: NetworkImage(item.enclosure!.url!),
+                              fit: BoxFit.cover)
+                          : null),
+              child: Column(
+                children: [
+                  const Spacer(),
+                  Expanded(
+                      child: Container(
+                          color: AppColors.secondary.withAlpha(200),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    item.title ?? '',
+                                    style: context.body,
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(item.formattedDate),
+                                ),
+                              )
+                            ],
+                          ))),
+                ],
+              ),
+            );
+          }),
     );
   }
 }
@@ -185,17 +193,32 @@ class NewsDetailsScreen extends StatelessWidget {
   static Route route(RssItem item) =>
       createRoute((context) => NewsDetailsScreen(item));
 
-  Future<List<String>> _parseNewspage(String url) async {
-    final data = (await Dio().get(url)).data.toString();
+  static final _figures = <String, List<String>>{};
+
+  static final _dio = Dio();
+  // ..interceptors.add(QueuedInterceptorsWrapper(
+  //   onRequest: (options, handler) async {
+  //     // await Future.delayed(const Duration(seconds: 1));
+  //   },
+  // ));
+
+  static Future<List<String>> parseNewspage(RssItem item) async {
+    if (item.link == null) return const [];
+    final url = item.link!;
+
+    if (_figures.containsKey(url)) return _figures[url]!;
+
+    final data = (await _dio.get(url)).data.toString();
 
     final htmlDom = parse(data);
     final figures = htmlDom.getElementsByClassName('b-preview-img');
 
     final host = 'https://${Uri.parse(item.link!).host}';
 
-    return figures
+    _figures[url] = figures
         .map((e) => host + (e.nodes[3].attributes['href'] ?? ''))
         .toList();
+    return _figures[url]!;
   }
 
   @override
@@ -203,7 +226,7 @@ class NewsDetailsScreen extends StatelessWidget {
     return PageTemplate(
         title: 'Новости',
         body: ReloadableFutureBuilder<List<String>>(
-            future: () => _parseNewspage(item.link!),
+            future: () => parseNewspage(item),
             builder: (data) {
               return SingleChildScrollView(
                 child: Column(
