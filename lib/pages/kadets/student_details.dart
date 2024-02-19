@@ -74,7 +74,7 @@ class StudentDetailsPage extends StatelessWidget {
                               context),
                           _dataRow(
                               'Дата рождения',
-                              data.info.first.birthdate.substring(0, 10),
+                              data.info.first.birthday.substring(0, 10),
                               context),
                           _dataRow('Военный округ',
                               data.info.first.militaryDistrict, context),

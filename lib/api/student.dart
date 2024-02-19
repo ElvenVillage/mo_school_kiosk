@@ -9,7 +9,7 @@ class StudentInfo {
   final String id;
   final String lastname;
   final String patronymic;
-  final String birthdate;
+  final String birthday;
   final String birthplace;
   @JsonKey(name: 'enter_date')
   final String enterDate;
@@ -28,7 +28,7 @@ class StudentInfo {
     required this.id,
     required this.lastname,
     required this.patronymic,
-    required this.birthdate,
+    required this.birthday,
     required this.birthplace,
     required this.enterDate,
     required this.militaryDistrict,

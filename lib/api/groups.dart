@@ -55,7 +55,7 @@ class Student {
   @JsonKey(name: 'firstname')
   final String firstName;
   final String patronymic;
-  final String birthdate;
+  final String birthday;
 
   factory Student.fromJson(Map<String, dynamic> json) =>
       _$StudentFromJson(json);
@@ -65,7 +65,7 @@ class Student {
     required this.lastName,
     required this.firstName,
     required this.patronymic,
-    required this.birthdate,
+    required this.birthday,
   });
 
   String get fio => '$lastName\n$firstName\n$patronymic';
@@ -79,7 +79,7 @@ class StudentListAnswer {
   final String result;
   final String message;
   final String code;
-  final List<Student> data;
+  final List<Student>? data;
 
   factory StudentListAnswer.fromJson(Map<String, dynamic> json) =>
       _$StudentListAnswerFromJson(json);

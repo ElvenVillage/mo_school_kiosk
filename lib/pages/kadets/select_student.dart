@@ -51,7 +51,7 @@ class SelectStudentPage extends StatelessWidget {
                     crossAxisCount: 5,
                     childAspectRatio: 3,
                     children: [
-                      for (final student in students)
+                      for (final student in students ?? const [])
                         GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(
