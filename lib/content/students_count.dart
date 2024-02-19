@@ -213,7 +213,8 @@ class _MaxAdmission extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  maxF?.value.toString().replaceAll('.', ',') ?? '0',
+                  maxF?.value?.toStringAsPrecision(3).replaceAll('.', ',') ??
+                      '0',
                   style: context.headlineMedium,
                 ),
               ),
@@ -230,7 +231,8 @@ class _MaxAdmission extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  maxM?.value.toString().replaceAll('.', ',') ?? '0',
+                  maxM?.value?.toStringAsPrecision(3).replaceAll('.', ',') ??
+                      '0',
                   style: context.headlineMedium,
                 ),
               ),

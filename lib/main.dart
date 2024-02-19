@@ -328,13 +328,19 @@ class _TopThreeList extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                      '${((school.value ?? 0.0) / 100).toStringAsFixed(2)} '
-                          .replaceAll('.', ','),
-                      style: context.headlineMedium
-                          .copyWith(fontWeight: FontWeight.bold)),
-                ),
+                Builder(builder: (context) {
+                  final value = switch (indicator) {
+                    Indicator.komplekt =>
+                      '${(school.value ?? 0.0).toStringAsFixed(0)}%',
+                    _ => '${((school.value ?? 0.0) / 100).toStringAsFixed(2)} '
+                  };
+
+                  return Expanded(
+                    child: Text(value.replaceAll('.', ','),
+                        style: context.headlineMedium
+                            .copyWith(fontWeight: FontWeight.bold)),
+                  );
+                }),
                 Expanded(
                     flex: 6,
                     child: Text(
