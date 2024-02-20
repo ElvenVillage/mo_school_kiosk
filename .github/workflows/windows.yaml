@@ -32,7 +32,7 @@ jobs:
         with:
           type: 'zip'
           filename: kiosk-dovuz-windows.zip
-          directory: build/windows/runner/Release
+          directory: build\windows\x64\runner\Release
           
 
       - name: Upload a Build Artifact
