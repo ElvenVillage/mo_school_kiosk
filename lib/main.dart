@@ -268,8 +268,20 @@ class _AppState extends State<App> {
               ),
             ),
             Builder(builder: (context) {
-              final data = context.watch<StatsProvider>().stats;
-              if (data.isEmpty) {
+              final provider = context.watch<StatsProvider>();
+              if (provider.stats.isEmpty && provider.error.isNotEmpty) {
+                return Container(
+                  color: Colors.grey.withAlpha(220),
+                  width: double.maxFinite,
+                  height: double.maxFinite,
+                  child: GestureDetector(
+                      onTap: () {
+                        context.read<StatsProvider>().load();
+                      },
+                      child: Center(child: Text(provider.error))),
+                );
+              }
+              if (provider.stats.isEmpty) {
                 return Container(
                   color: Colors.grey.withAlpha(100),
                   width: double.maxFinite,

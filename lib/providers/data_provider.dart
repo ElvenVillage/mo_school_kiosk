@@ -66,39 +66,51 @@ class StatsProvider extends ChangeNotifier {
   }
 
   Map<Indicator, Map<School, num?>> stats = {};
+  var error = "";
 
   final schools = <School>[];
   final reports = <School, List<ReportData>>{};
 
   Future<void> load() async {
-    final data = await client.getStats();
+    try {
+      error = '';
+      notifyListeners();
+      final data = await client.getStats();
 
-    final dataBySchools = data.answer.data.groupListsBy((e) => School(
-        id: e.orgId,
-        name: e.orgName.replaceAll('\n', ' '),
-        dbName: e.dbName ?? ''));
+      final dataBySchools = data.answer.data.groupListsBy((e) => School(
+          id: e.orgId,
+          name: e.orgName.replaceAll('\n', ' '),
+          dbName: e.dbName ?? ''));
 
-    for (final indicator in Indicator.values) {
-      stats[indicator] = getData(dataBySchools, indicator);
+      for (final indicator in Indicator.values) {
+        stats[indicator] = getData(dataBySchools, indicator);
+      }
+
+      schools
+        ..clear()
+        ..addAll(dataBySchools.keys);
+
+      await loadReports();
+    } catch (e) {
+      error = e.toString();
     }
-
-    schools
-      ..clear()
-      ..addAll(dataBySchools.keys);
-
-    await loadReports();
 
     notifyListeners();
   }
 
   Future<void> loadReports() async {
+    error = '';
+    notifyListeners();
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
     for (final school in schools) {
       try {
         final response = await client.getReport(school.id, date);
         reports[school] = response.answer.data;
+
         notifyListeners();
-      } catch (_) {}
+      } catch (e) {
+        error = e.toString();
+      }
     }
   }
 }
