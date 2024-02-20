@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ import 'package:mo_school_kiosk/widgets/back_button.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
 import 'package:mo_school_kiosk/widgets/top_five_card.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'content/main_structure.dart';
 import 'content/students_count.dart';
@@ -36,9 +39,23 @@ class CustomScrollBehavior extends ScrollBehavior {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await initializeDateFormatting('ru_RU');
 
+  if (Platform.isWindows) {
+    await windowManager.ensureInitialized();
+
+    const windowOptions = WindowOptions(
+      fullScreen: true,
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
   runApp(const App());
 }
 
