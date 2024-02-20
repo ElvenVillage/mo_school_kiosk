@@ -53,41 +53,47 @@ class IntensityCourse extends StatelessWidget {
             future: () => _load(),
             builder: (_Intensity data) {
               return SingleChildScrollView(
-                child: Wrap(
-                  children: [
-                    for (final subject in data.entries.sorted((a, b) =>
-                        (num.parse(b.value) - num.parse(a.value)).sign.toInt()))
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        height: 75,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(IntensityTeacher.route(
-                                school, subject.key.$2, subject.key.$1));
-                          },
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 20.0),
-                                  child: RichText(
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      text: TextSpan(
-                                          text: '${subject.value}% ',
-                                          children: [
-                                            TextSpan(
-                                                text: subject.key.$1,
-                                                style: context.headlineMedium)
-                                          ],
-                                          style: context.headlineLarge)),
-                                ),
-                              )
-                            ],
+                child: SizedBox(
+                  width: double.maxFinite,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      for (final subject in data.entries.sorted((a, b) =>
+                          (num.parse(b.value) - num.parse(a.value))
+                              .sign
+                              .toInt()))
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 75,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(IntensityTeacher.route(
+                                  school, subject.key.$2, subject.key.$1));
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 20.0),
+                                    child: RichText(
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        text: TextSpan(
+                                            text: '${subject.value}% ',
+                                            children: [
+                                              TextSpan(
+                                                  text: subject.key.$1,
+                                                  style: context.headlineMedium)
+                                            ],
+                                            style: context.headlineLarge)),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                  ],
+                        )
+                    ],
+                  ),
                 ),
               );
             }));

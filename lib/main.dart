@@ -26,6 +26,12 @@ class CustomScrollBehavior extends ScrollBehavior {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
       };
+
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
 }
 
 void main() async {
