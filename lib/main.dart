@@ -124,7 +124,13 @@ class _SectionCard extends StatelessWidget {
                                     fontWeight: FontWeight.bold))),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text((value ?? '').replaceAll('.', ','),
+                          child: Text(
+                              (value?.isEmpty ?? true)
+                                  ? ''
+                                  : (num.tryParse(value ?? '0.0') ?? 0.0)
+                                      .toDouble()
+                                      .toStringAsFixed(1)
+                                      .replaceAll('.', ','),
                               style: context.headlineLarge.copyWith(
                                 fontSize: 85.0,
                               )),
