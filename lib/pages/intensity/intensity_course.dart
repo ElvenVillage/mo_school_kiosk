@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
@@ -55,45 +57,61 @@ class IntensityCourse extends StatelessWidget {
               return SingleChildScrollView(
                 child: SizedBox(
                   width: double.maxFinite,
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    children: [
-                      for (final subject in data.entries.sorted((a, b) =>
-                          (num.parse(b.value) - num.parse(a.value))
-                              .sign
-                              .toInt()))
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          height: 75,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(IntensityTeacher.route(
-                                  school, subject.key.$2, subject.key.$1));
-                            },
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 20.0),
-                                    child: RichText(
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        text: TextSpan(
-                                            text: '${subject.value}% ',
-                                            children: [
-                                              TextSpan(
-                                                  text: subject.key.$1,
-                                                  style: context.headlineMedium)
-                                            ],
-                                            style: context.headlineLarge)),
-                                  ),
-                                )
-                              ],
+                  child: Builder(builder: (context) {
+                    final entries = [
+                      ...data.entries,
+                      ...[
+                        for (var i = 0;
+                            i < data.entries.length.remainder(3);
+                            i++)
+                          const MapEntry(('', '-1'), '-1')
+                      ]
+                    ];
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      children: [
+                        for (final subject in entries.sorted((a, b) =>
+                            (num.parse(b.value) - num.parse(a.value))
+                                .sign
+                                .toInt()))
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            height: 75,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    IntensityTeacher.route(school,
+                                        subject.key.$2, subject.key.$1));
+                              },
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 20.0),
+                                      child: RichText(
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          text: TextSpan(
+                                              text: subject.key.$2 == '-1'
+                                                  ? ''
+                                                  : '${subject.value}% ',
+                                              children: [
+                                                TextSpan(
+                                                    text: subject.key.$1,
+                                                    style:
+                                                        context.headlineMedium)
+                                              ],
+                                              style: context.headlineLarge)),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                    ],
-                  ),
+                          )
+                      ],
+                    );
+                  }),
                 ),
               );
             }));
