@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mo_school_kiosk/content/top_five_list.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_school.dart';
 import 'package:mo_school_kiosk/pages/komplekt.dart';
 import 'package:mo_school_kiosk/pages/news_screen.dart';
@@ -15,7 +16,6 @@ import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/back_button.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
-import 'package:mo_school_kiosk/widgets/top_five_card.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -240,7 +240,7 @@ class _AppState extends State<App> {
                                 child: Image.asset('assets/top5.png'),
                               ),
                               const Expanded(
-                                child: _TopFiveList(
+                                child: TopFiveList(
                                   caption: 'СРЕДНИЙ БАЛЛ',
                                   indicator: Indicator.averageGrade,
                                   maxValue: 5.0,
@@ -248,7 +248,7 @@ class _AppState extends State<App> {
                               ),
                               _gap(),
                               const Expanded(
-                                child: _TopFiveList(
+                                child: TopFiveList(
                                   caption:
                                       'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
                                   indicator: Indicator.plan,
@@ -258,7 +258,7 @@ class _AppState extends State<App> {
                               ),
                               _gap(),
                               const Expanded(
-                                child: _TopFiveList(
+                                child: TopFiveList(
                                   caption:
                                       'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
                                   indicator: Indicator.events,
@@ -316,39 +316,6 @@ class _AppState extends State<App> {
       color: AppColors.secondary,
       height: double.maxFinite,
       width: 1,
-    );
-  }
-}
-
-class _TopFiveList extends StatelessWidget {
-  const _TopFiveList({
-    required this.caption,
-    required this.indicator,
-    this.add = '',
-    this.maxValue,
-  });
-
-  final String caption;
-  final Indicator indicator;
-  final String add;
-  final double? maxValue;
-
-  @override
-  Widget build(BuildContext context) {
-    final data = context.watch<StatsProvider>().stats[indicator] ?? {};
-    final sorted = data.entries.sorted(numCompare).take(5);
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TopFiveCard(title: caption, data: [
-        for (final school in sorted)
-          (
-            title: school.key.name,
-            maxValue: maxValue ?? sorted.first.value!,
-            value: school.value ?? 0,
-            add: add
-          ),
-      ]),
     );
   }
 }

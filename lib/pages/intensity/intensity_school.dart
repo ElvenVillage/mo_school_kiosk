@@ -1,10 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mo_school_kiosk/pages/intensity/intensity_course.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
-import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
+import 'package:mo_school_kiosk/widgets/school_value_card.dart';
 import 'package:provider/provider.dart';
 
 class IntensitySchool extends StatelessWidget {
@@ -17,41 +16,28 @@ class IntensitySchool extends StatelessWidget {
     final data = context.watch<StatsProvider>().stats[Indicator.intensity]!;
     final sorted = data.entries.sorted(numCompare);
 
+    final width = MediaQuery.of(context).size.width;
+
     return PageTemplate(
         title: 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
         body: SingleChildScrollView(
           child: SizedBox(
             width: double.maxFinite,
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                for (final school in sorted)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      height: 120,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context)
-                              .push(IntensityCourse.route(school.key));
-                        },
-                        child: RichText(
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                              text: '${school.value}% ',
-                              style: context.headlineLarge,
-                              children: [
-                                TextSpan(
-                                    text: school.key.name,
-                                    style: context.headlineMedium)
-                              ]),
-                        ),
+            child: Padding(
+              padding: EdgeInsets.only(left: width * 0.05),
+              child: Wrap(
+                children: [
+                  for (final school in sorted)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SchoolValueCard(
+                        school: school.key,
+                        value: school.value,
+                        add: '%',
                       ),
-                    ),
-                  )
-              ],
+                    )
+                ],
+              ),
             ),
           ),
         ));

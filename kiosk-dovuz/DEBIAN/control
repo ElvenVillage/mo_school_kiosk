@@ -1,6 +1,0 @@
-Package: kiosk-dovuz
-Version: 1.2
-Maintainer: Nintegra
-Architecture: all
-Description: LMS Kiosk
-Depends:  libgtk-3-0, libblkid1, liblzma5

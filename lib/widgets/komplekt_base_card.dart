@@ -7,12 +7,13 @@ class KomplektModel {
   final num? total;
   final num? first;
   final num? highest;
-  final double value;
+  final num value;
+  final String add;
 
   int get firstNum => (total ?? 0) * (first ?? 0) ~/ 100;
   int get highestNum => (total ?? 0) * (highest ?? 0) ~/ 100;
 
-  KomplektModel(this.total, this.first, this.highest, this.value);
+  KomplektModel(this.total, this.first, this.highest, this.value, this.add);
 }
 
 class KomplektCard extends StatelessWidget {
@@ -81,18 +82,21 @@ class KomplektCard extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _dataRow(komplekt.total.toString(),
-                                  'всего педработников', context),
-                              _dataRow(komplekt.firstNum.toString(),
-                                  'первой категории', context),
-                              _dataRow(komplekt.highestNum.toString(),
-                                  'высшей категории', context),
+                              if (komplekt.total != null)
+                                _dataRow(komplekt.total.toString(),
+                                    'всего педработников', context),
+                              if (komplekt.first != null)
+                                _dataRow(komplekt.firstNum.toString(),
+                                    'первой категории', context),
+                              if (komplekt.highest != null)
+                                _dataRow(komplekt.highestNum.toString(),
+                                    'высшей категории', context),
                             ],
                           ),
                           const Spacer(flex: 3),
                           if (komplekt.value > 0.0)
                             Text(
-                              '${komplekt.value}%',
+                              '${komplekt.value}${komplekt.add}',
                               style: context.headlineLarge,
                             ),
                           const Spacer(),

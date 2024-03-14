@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
@@ -31,6 +29,8 @@ class IntensityCourse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return PageTemplate(
         title: 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
         subtitle: '',
@@ -67,49 +67,51 @@ class IntensityCourse extends StatelessWidget {
                           const MapEntry(('', '-1'), '-1')
                       ]
                     ];
-                    return Wrap(
-                      alignment: WrapAlignment.center,
-                      children: [
-                        for (final subject in entries.sorted((a, b) =>
-                            (num.parse(b.value) - num.parse(a.value))
-                                .sign
-                                .toInt()))
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            height: 75,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                    IntensityTeacher.route(school,
-                                        subject.key.$2, subject.key.$1));
-                              },
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 20.0),
-                                      child: RichText(
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          text: TextSpan(
-                                              text: subject.key.$2 == '-1'
-                                                  ? ''
-                                                  : '${subject.value}% ',
-                                              children: [
-                                                TextSpan(
-                                                    text: subject.key.$1,
-                                                    style:
-                                                        context.headlineMedium)
-                                              ],
-                                              style: context.headlineLarge)),
-                                    ),
-                                  )
-                                ],
+                    return Padding(
+                      padding: EdgeInsets.only(left: width * 0.05),
+                      child: Wrap(
+                        children: [
+                          for (final subject in entries.sorted((a, b) =>
+                              (num.parse(b.value) - num.parse(a.value))
+                                  .sign
+                                  .toInt()))
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              height: 75,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                      IntensityTeacher.route(school,
+                                          subject.key.$2, subject.key.$1));
+                                },
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 20.0),
+                                        child: RichText(
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            text: TextSpan(
+                                                text: subject.key.$2 == '-1'
+                                                    ? ''
+                                                    : '${subject.value}% ',
+                                                children: [
+                                                  TextSpan(
+                                                      text: subject.key.$1,
+                                                      style: context
+                                                          .headlineMedium)
+                                                ],
+                                                style: context.headlineLarge)),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                      ],
+                            )
+                        ],
+                      ),
                     );
                   }),
                 ),

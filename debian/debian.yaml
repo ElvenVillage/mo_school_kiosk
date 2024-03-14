@@ -1,0 +1,14 @@
+flutter_app: 
+  command: kiosk-dovuz
+  arch: x64
+  parent: /usr/local/lib
+  nonInteractive: false
+
+control:
+  Package: kiosk-dovuz
+  Version: 1.3.0
+  Architecture: amd64
+  Priority: optional
+  Depends: libgtk-3-0, libblkid1, liblzma5
+  Maintainer: Nintegra
+  Description: LMS Kiosk
