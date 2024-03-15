@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mo_school_kiosk/content/top_five_list.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_school.dart';
@@ -176,6 +178,30 @@ class _AppState extends State<App> {
   final _navigator = GlobalKey<NavigatorState>();
   final _listener = NavigatorListener();
 
+  final _carouselController = InfiniteScrollController();
+
+  Timer? _timer;
+
+  @override
+  void initState() {
+    _setupTimer();
+    super.initState();
+  }
+
+  void _setupTimer() {
+    _timer?.cancel();
+
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _carouselController.nextItem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -235,35 +261,66 @@ class _AppState extends State<App> {
                         Expanded(
                           child: Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Image.asset('assets/top5.png'),
-                              ),
-                              const Expanded(
-                                child: TopFiveList(
-                                  caption: 'СРЕДНИЙ БАЛЛ',
-                                  indicator: Indicator.averageGrade,
-                                  maxValue: 5.0,
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Image.asset('assets/top5.png'),
                                 ),
                               ),
-                              _gap(),
-                              const Expanded(
-                                child: TopFiveList(
-                                  caption:
-                                      'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
-                                  indicator: Indicator.plan,
-                                  maxValue: 100.0,
-                                  add: '% ',
+                              Expanded(
+                                flex: 8,
+                                child: InfiniteCarousel.builder(
+                                  controller: _carouselController,
+                                  itemExtent: 1980 / 9 * 4 - 24,
+                                  center: false,
+                                  itemCount: 6,
+                                  onIndexChanged: (_) => _setupTimer(),
+                                  itemBuilder: (context, itemIndex, realIndex) {
+                                    final stats = switch (itemIndex) {
+                                      0 => const TopFiveList(
+                                          caption: 'СРЕДНИЙ БАЛЛ',
+                                          indicator: Indicator.averageGrade,
+                                          maxValue: 5.0,
+                                        ),
+                                      1 => const TopFiveList(
+                                          caption:
+                                              'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
+                                          indicator: Indicator.plan,
+                                          maxValue: 100.0,
+                                          add: '% ',
+                                        ),
+                                      2 => const TopFiveList(
+                                          caption:
+                                              'ПРОЦЕНТ КОММЕНТИРОВАНИЯ ВЫСТАВЛЕННЫХ ОЦЕНОК',
+                                          indicator: Indicator.commentsGrades,
+                                          add: '%',
+                                        ),
+                                      3 => const TopFiveList(
+                                          caption:
+                                              'ПРОЦЕНТ ЗАНЯТИЙ С ЭЛЕКТРОННЫМИ МАТЕРИАЛАМИ',
+                                          indicator: Indicator.elMaterials,
+                                          add: '%',
+                                        ),
+                                      4 => const TopFiveList(
+                                          caption:
+                                              'КОЛИЧЕСТВО СТОБАЛЛЬНИКОВ ПО ЕГЭ',
+                                          indicator: Indicator.score100),
+                                      _ => const TopFiveList(
+                                          caption:
+                                              'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
+                                          indicator: Indicator.events,
+                                        )
+                                    };
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(child: stats),
+                                        _gap()
+                                      ],
+                                    );
+                                  },
                                 ),
                               ),
-                              _gap(),
-                              const Expanded(
-                                child: TopFiveList(
-                                  caption:
-                                      'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
-                                  indicator: Indicator.events,
-                                ),
-                              )
                             ],
                           ),
                         )

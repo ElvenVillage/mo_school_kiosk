@@ -1,2 +1,2 @@
 #!/bin/sh
-ln -s /usr/local/lib/lms-kiosk-ros/kiosk_lms_ros /usr/bin/lms-kiosk-ros
+ln -s /usr/local/lib/kiosk-dovuz/mo_school_kiosk /usr/bin/kiosk-dovuz

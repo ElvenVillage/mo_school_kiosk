@@ -24,20 +24,26 @@ class TopFiveList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<StatsProvider>().stats[indicator] ?? {};
-    final sorted = data.entries.sorted(numCompare).take(5);
+    final sorted =
+        data.entries.where((e) => e.value != null).sorted(numCompare).take(5);
+
+    final maxValue =
+        sorted.isEmpty || sorted.first.value == null || sorted.first.value == 0
+            ? 1
+            : sorted.first.value!;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          Navigator.of(context)
-              .push(TopFivePage.route(caption: caption, indicator: indicator));
+          Navigator.of(context).push(TopFivePage.route(
+              caption: caption, indicator: indicator, add: add));
         },
         child: TopFiveCard(title: caption, data: [
           for (final school in sorted)
             (
               title: school.key.name,
-              maxValue: maxValue ?? sorted.first.value!,
+              maxValue: maxValue,
               value: school.value ?? 0,
               add: add
             ),
@@ -52,23 +58,24 @@ class TopFivePage extends StatelessWidget {
     super.key,
     required this.caption,
     required this.indicator,
+    required this.add,
   });
 
   final String caption;
   final Indicator indicator;
+  final String add;
 
-  static Route route({required String caption, required Indicator indicator}) =>
-      createRoute(
-          (context) => TopFivePage(caption: caption, indicator: indicator));
+  static Route route(
+          {required String caption,
+          required Indicator indicator,
+          required String add}) =>
+      createRoute((context) =>
+          TopFivePage(caption: caption, indicator: indicator, add: add));
 
   @override
   Widget build(BuildContext context) {
     final data = context.watch<StatsProvider>().stats[indicator] ?? {};
     final sorted = data.entries.sorted(numCompare);
-
-    final width = MediaQuery.of(context).size.width;
-
-    final add = switch (indicator) { Indicator.plan => '%', _ => '' };
 
     return PageTemplate(
         title: caption,
@@ -79,7 +86,8 @@ class TopFivePage extends StatelessWidget {
               shrinkWrap: true,
               crossAxisSpacing: 50,
               childAspectRatio: 5,
-              children: sorted.mapIndexed((idx, db) {
+              children:
+                  sorted.where((db) => db.value != null).mapIndexed((idx, db) {
                 return Row(
                   children: [
                     if (idx.isEven) const Spacer(),

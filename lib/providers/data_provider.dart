@@ -28,7 +28,13 @@ enum Indicator {
   // число обучающихся (девочки)
   countF('13', '15'),
   // интенсивность оценивания по предметам
-  intensitySubject('8');
+  intensitySubject('8'),
+  // процент комментирования выставленных оценок
+  commentsGrades('16'),
+  // процент занятий с электронными материалами
+  elMaterials('17'),
+  // количество стобалльников по ЕГЭ
+  score100('18');
 
   final String value;
   final String? subID;

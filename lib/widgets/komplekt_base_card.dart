@@ -93,7 +93,7 @@ class KomplektCard extends StatelessWidget {
                                     'высшей категории', context),
                             ],
                           ),
-                          const Spacer(flex: 3),
+                          if (komplekt.total != null) const Spacer(flex: 3),
                           if (komplekt.value > 0.0)
                             Text(
                               '${komplekt.value}${komplekt.add}',

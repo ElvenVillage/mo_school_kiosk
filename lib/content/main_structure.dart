@@ -85,8 +85,8 @@ class _MainStructureState extends State<MainStructure> {
         .map<_StructureModel>((e) => _StructureModel.fromJson(e))
         .toList();
     return [
-      const _StructureModel(
-          'образовательные организации', 'assets/schools/obrmo.png', 33),
+      _StructureModel('образовательные организации', 'assets/schools/obrmo.png',
+          33, [...data.expand((e) => e.schools ?? [])]),
       ...data
     ];
   }
