@@ -186,6 +186,8 @@ class _AppState extends State<App> {
   void initState() {
     _setupTimer();
     super.initState();
+
+    _carouselController.addListener(_setupTimer);
   }
 
   void _setupTimer() {
@@ -274,7 +276,6 @@ class _AppState extends State<App> {
                                   itemExtent: 1980 / 9 * 4 - 24,
                                   center: false,
                                   itemCount: 6,
-                                  onIndexChanged: (_) => _setupTimer(),
                                   itemBuilder: (context, itemIndex, realIndex) {
                                     final stats = switch (itemIndex) {
                                       0 => const TopFiveList(
