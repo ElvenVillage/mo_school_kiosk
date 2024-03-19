@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/groups.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
@@ -7,6 +9,18 @@ import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/base_card.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
+
+class CircleRevealClipper extends CustomClipper<Rect> {
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromCircle(
+        center: Offset(size.width / 2, size.height / 2 - 10),
+        radius: size.width * 0.5 - 10);
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Rect> oldClipper) => true;
+}
 
 class SelectStudentPage extends StatelessWidget {
   const SelectStudentPage(this.school, this.group, {super.key});
@@ -49,7 +63,7 @@ class SelectStudentPage extends StatelessWidget {
                   final students = data.answer.data;
                   return GridView.count(
                     crossAxisCount: 5,
-                    childAspectRatio: 3,
+                    childAspectRatio: 2.2,
                     children: [
                       for (final student in students ?? const [])
                         GestureDetector(
@@ -61,13 +75,20 @@ class SelectStudentPage extends StatelessWidget {
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 64.0,
-                                  backgroundImage: NetworkImage(
-                                      student.photoUrl('nnz', 'Sonyk12345678')),
+                                SizedBox(
+                                  height: 128,
+                                  width: 128,
+                                  child: ClipOval(
+                                      clipper: CircleRevealClipper(),
+                                      child: Image.network(
+                                        student.photoUrl(
+                                            'nnz', 'Sonyk12345678'),
+                                        fit: BoxFit.cover,
+                                      )),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.fromLTRB(
+                                      24.0, 0.0, 8.0, 36.0),
                                   child: Text(
                                     student.fio,
                                     style: context.body,

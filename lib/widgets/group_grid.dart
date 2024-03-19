@@ -54,7 +54,7 @@ class GroupGrid extends StatelessWidget {
           .map((row) => Row(
                 children: row
                     .map((group) => _GroupButton(
-                          key: Key(group.id),
+                          key: UniqueKey(),
                           school: school,
                           group: group,
                           onTap: onTap,

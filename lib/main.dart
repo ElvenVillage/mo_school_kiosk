@@ -234,6 +234,7 @@ class _AppState extends State<App> {
               debugShowCheckedModeBanner: false,
               home: Scaffold(
                 appBar: const LmsAppBar(
+                    displayVersion: true,
                     title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
                 body: Builder(builder: (context) {
                   return Container(
