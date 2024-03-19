@@ -208,7 +208,9 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       lazy: false,
-      create: (context) => StatsProvider()..load(),
+      create: (context) => StatsProvider()
+        ..load()
+        ..setupTimer(),
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: Stack(
@@ -333,26 +335,25 @@ class _AppState extends State<App> {
             ),
             Builder(builder: (context) {
               final provider = context.watch<StatsProvider>();
-              if (provider.stats.isEmpty && provider.error.isNotEmpty) {
-                return Container(
-                  color: Colors.grey.withAlpha(220),
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  child: GestureDetector(
-                      onTap: () {
-                        context.read<StatsProvider>().load();
-                      },
-                      child: Center(child: Text(provider.error))),
-                );
-              }
+
               if (provider.stats.isEmpty) {
                 return Container(
                   color: Colors.grey.withAlpha(100),
                   width: double.maxFinite,
                   height: double.maxFinite,
-                  child: const Center(
-                      child: CircularProgressIndicator(
-                    color: Colors.white,
+                  child: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (provider.error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(provider.error),
+                        ),
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ],
                   )),
                 );
               }

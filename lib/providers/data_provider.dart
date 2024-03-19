@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -52,6 +54,8 @@ enum ReportIndicator {
 }
 
 class StatsProvider extends ChangeNotifier {
+  Timer? _timer;
+
   Map<School, num?> getData(Map<School, List<StatsData>> data, Indicator ind) {
     return data.map((key, value) => MapEntry(
         key,
@@ -77,10 +81,16 @@ class StatsProvider extends ChangeNotifier {
   final schools = <School>[];
   final reports = <School, List<ReportData>>{};
 
+  void setupTimer() {
+    _timer = Timer.periodic(const Duration(minutes: 30), (_) {
+      stats.clear();
+      notifyListeners();
+      load();
+    });
+  }
+
   Future<void> load() async {
     try {
-      error = '';
-      notifyListeners();
       final data = await client.getStats();
 
       final dataBySchools = data.answer.data.groupListsBy((e) => School(
@@ -96,17 +106,17 @@ class StatsProvider extends ChangeNotifier {
         ..clear()
         ..addAll(dataBySchools.keys);
 
+      error = '';
+      notifyListeners();
       await loadReports();
     } catch (e) {
       error = e.toString();
+      notifyListeners();
+      load();
     }
-
-    notifyListeners();
   }
 
   Future<void> loadReports() async {
-    error = '';
-    notifyListeners();
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
     for (final school in schools) {
       try {
@@ -118,5 +128,12 @@ class StatsProvider extends ChangeNotifier {
         error = e.toString();
       }
     }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
