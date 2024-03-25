@@ -405,28 +405,36 @@ class _LessonCard extends StatelessWidget {
                       color: AppColors.darkGreen,
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
-                        child: Column(
+                        child: Row(
                           children: [
-                            ListTile(
-                              title: Text(
-                                e.title,
-                                style: context.headlineMedium,
-                              ),
-                              trailing: Text(
-                                '${periodData.periodFormatted}\n${periodData.name}',
-                                style: context.body,
+                            Expanded(
+                              child: CircleAvatar(
+                                radius: 64.0,
+                                backgroundImage: NetworkImage(
+                                    'https://wq.lms-school.ru/?action=pub_image&person=${teacher?.id}&base=${provider.dbName}'),
                               ),
                             ),
-                            ListTile(
-                              title: Text(
-                                teacher?.fio ?? '',
-                                style: context.body,
-                              ),
-                            ),
-                            ListTile(
-                              title: Text(
-                                room?.name ?? '',
-                                style: context.body,
+                            Expanded(
+                              flex: 4,
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    title: Text(
+                                      e.title,
+                                      style: context.headlineMedium,
+                                    ),
+                                    trailing: Text(
+                                      '${periodData.periodFormatted}\n${periodData.name}\n${room?.name}',
+                                      style: context.body,
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      '${teacher?.fio}\n${lesson.first.course}',
+                                      style: context.body,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

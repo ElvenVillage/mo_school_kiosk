@@ -414,7 +414,7 @@ class _TopThreeList extends StatelessWidget {
                     child: Text(
                       school.key.name,
                       style: context.body,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ))
               ],
