@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/content/school_details_page.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/base_grid.dart';
@@ -10,11 +11,12 @@ import 'package:mo_school_kiosk/widgets/page_template.dart';
 class _SchoolModel {
   final String name;
   final String assetName;
+  final String id;
 
-  factory _SchoolModel.fromJson(Map<String, dynamic> json) =>
-      _SchoolModel(json['name'], 'assets/logos/${json["logo"]}.png');
+  factory _SchoolModel.fromJson(Map<String, dynamic> json) => _SchoolModel(
+      json['name'], 'assets/logos/${json["logo"]}.png', json['id']);
 
-  const _SchoolModel(this.name, this.assetName);
+  const _SchoolModel(this.name, this.assetName, this.id);
 }
 
 class _StructureModel {
@@ -182,10 +184,13 @@ class _SchoolsListPage extends StatelessWidget {
     return PageTemplate(
       title: '${data.count} ${data.name}',
       body: BaseGrid(
+        onTap: (school) {
+          Navigator.of(context).push(SchoolDetailsPage.route(school));
+        },
         schools: data.schools?.map((e) {
               final segments = e.assetName.split('/');
               final dbName = segments.last.replaceAll('.png', '');
-              return School(id: dbName, name: e.name, dbName: dbName);
+              return School(id: e.id, name: e.name, dbName: dbName);
             }).toList() ??
             const [],
       ),

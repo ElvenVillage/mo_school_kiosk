@@ -7,6 +7,8 @@ import 'schedule.dart';
 import 'stats.dart';
 import 'student.dart';
 import 'weeks.dart';
+import 'phonebook.dart';
+import 'count.dart';
 
 part 'api.g.dart';
 
@@ -70,6 +72,16 @@ abstract class ConsolidatedClient {
     @Query('id') String id,
     @Query('date') String date,
   );
+
+  @GET('/?action=consolidated.phonebook&school=0')
+  Future<PhonebookResponse> getPhonebookReport(
+    @Query('idOrg') String schoolId,
+  );
+
+  @GET('/?action=consolidated.report.students_total&school=0')
+  Future<CountReportResponse> getCountReport(
+    @Query('idOrg') String schoolId,
+  );
 }
 
 @RestApi(baseUrl: 'https://wq.lms-school.ru')
@@ -88,11 +100,25 @@ abstract class BaseClient {
   );
 }
 
-final _dio = Dio()
-  ..interceptors
-      .add(ConsolidatedInterceptor(login: 'nnz', password: 'Sonyk12345678'));
+class LmsErrorInterceptor extends Interceptor {
+  @override
+  void onResponse(
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) {
+    if (response.data is Map) {
+      final answer = response.data['Answer'];
 
-final _baseDio = Dio();
+      if (answer['Result'] == 'Error') {
+        throw answer['Message'];
+      }
+    }
+    handler.next(response);
+  }
+}
 
-final baseClient = BaseClient(_baseDio);
-final client = ConsolidatedClient(_dio);
+final consolidatedDio = Dio()..interceptors.add(LmsErrorInterceptor());
+final baseDio = Dio()..interceptors.add(LmsErrorInterceptor());
+
+final baseClient = BaseClient(baseDio);
+final client = ConsolidatedClient(consolidatedDio);

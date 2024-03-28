@@ -11,6 +11,16 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final collapseTitle = title.length > 50;
+
+    final titleWidget = Text(title,
+        maxLines: collapseTitle ? 2 : 1,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontSize: collapseTitle ? 32.0 : 48.0,
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold));
+
     return Container(
       color: AppColors.secondary,
       child: Row(
@@ -27,11 +37,13 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           else
             const Spacer(),
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 48.0,
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold)),
+          if (collapseTitle)
+            Expanded(
+              flex: 4,
+              child: titleWidget,
+            )
+          else
+            titleWidget,
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,

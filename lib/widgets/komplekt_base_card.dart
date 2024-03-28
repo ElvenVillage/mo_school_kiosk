@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/style.dart';
-import 'package:mo_school_kiosk/widgets/base_card.dart';
+import 'package:mo_school_kiosk/widgets/school_logo.dart';
 
 class KomplektModel {
   final num? total;
@@ -47,14 +47,7 @@ class KomplektCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: FutureBuilder(
-                      future: BaseCard.getBaseImage(db),
-                      builder: (context, snapshot) {
-                        return CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 64.0,
-                            foregroundImage: snapshot.data);
-                      }),
+                  child: SchoolLogo(school: db),
                 ),
                 Expanded(
                     child: Column(

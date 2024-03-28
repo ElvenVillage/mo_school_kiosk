@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/content/top_five_list.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_school.dart';
 import 'package:mo_school_kiosk/pages/komplekt.dart';
@@ -13,6 +14,7 @@ import 'package:mo_school_kiosk/pages/news_screen.dart';
 import 'package:mo_school_kiosk/pages/kadets/select_base.dart';
 import 'package:mo_school_kiosk/schedule/schedule.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/settings.dart';
 
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
@@ -58,6 +60,11 @@ void main() async {
       await windowManager.focus();
     });
   }
+  await AppSettings.load();
+  consolidatedDio.interceptors.add(ConsolidatedInterceptor(
+      login: AppSettings.consolidatedLogin!,
+      password: AppSettings.consolidatedPassword!));
+
   runApp(const App());
 }
 

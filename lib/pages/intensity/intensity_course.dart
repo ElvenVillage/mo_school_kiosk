@@ -6,8 +6,8 @@ import 'package:mo_school_kiosk/pages/intensity/intensity_teacher.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
-import 'package:mo_school_kiosk/widgets/base_card.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
+import 'package:mo_school_kiosk/widgets/school_logo.dart';
 
 typedef _Intensity = Map<(String, String), String>;
 
@@ -40,14 +40,7 @@ class IntensityCourse extends StatelessWidget {
             const SizedBox(
               width: 50,
             ),
-            FutureBuilder(
-              future: BaseCard.getBaseImage(school),
-              builder: (context, snapshot) => CircleAvatar(
-                foregroundImage: snapshot.data,
-                backgroundColor: Colors.white,
-                radius: 64.0,
-              ),
-            ),
+            SchoolLogo(school: school),
             Text(school.name, style: context.headlineLarge),
           ],
         ),
