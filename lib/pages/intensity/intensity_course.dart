@@ -70,7 +70,6 @@ class IntensityCourse extends StatelessWidget {
                                   .toInt()))
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.3,
-                              height: 75,
                               child: InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(
@@ -80,23 +79,35 @@ class IntensityCourse extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20.0),
-                                        child: RichText(
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            text: TextSpan(
-                                                text: subject.key.$2 == '-1'
-                                                    ? ''
-                                                    : '${subject.value}% ',
-                                                children: [
-                                                  TextSpan(
-                                                      text: subject.key.$1,
-                                                      style: context
-                                                          .headlineMedium)
-                                                ],
-                                                style: context.headlineLarge)),
+                                      child: Container(
+                                        height: 90,
+                                        decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.white),
+                                            color: AppColors.darkGreen,
+                                            borderRadius:
+                                                BorderRadius.circular(28.0)),
+                                        padding: const EdgeInsets.all(8.0),
+                                        margin: const EdgeInsets.fromLTRB(
+                                            8.0, 8.0, 20.0, 8.0),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: RichText(
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              text: TextSpan(
+                                                  text: subject.key.$2 == '-1'
+                                                      ? ''
+                                                      : '${subject.value}% ',
+                                                  children: [
+                                                    TextSpan(
+                                                        text: subject.key.$1,
+                                                        style: context
+                                                            .headlineMedium)
+                                                  ],
+                                                  style:
+                                                      context.headlineLarge)),
+                                        ),
                                       ),
                                     )
                                   ],

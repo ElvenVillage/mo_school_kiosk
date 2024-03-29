@@ -3,12 +3,14 @@ import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/phonebook.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/settings.dart';
 import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 import 'package:mo_school_kiosk/widgets/school_logo.dart';
 import 'package:provider/provider.dart';
 
-class SchoolDetailsPage extends StatelessWidget {
+class SchoolDetailsPage extends StatefulWidget {
   const SchoolDetailsPage({super.key, required this.school});
   final School school;
 
@@ -16,16 +18,21 @@ class SchoolDetailsPage extends StatelessWidget {
       createRoute((context) => SchoolDetailsPage(school: school));
 
   @override
+  State<SchoolDetailsPage> createState() => _SchoolDetailsPageState();
+}
+
+class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         PageTemplate(
-            title: school.name,
+            title: widget.school.name,
             body: SizedBox(
                 width: double.maxFinite,
                 child: FutureBuilder(
                     future: Future.wait([
-                      client.getPhonebookReport(school.id),
+                      client.getPhonebookReport(widget.school.id),
                       _getStudentsCount()
                     ]),
                     builder: (context, snapshot) {
@@ -44,7 +51,7 @@ class SchoolDetailsPage extends StatelessWidget {
           top: 32,
           left: 36,
           child: SchoolLogo(
-            school: school,
+            school: widget.school,
             radius: 90.0,
           ),
         )
@@ -53,7 +60,7 @@ class SchoolDetailsPage extends StatelessWidget {
   }
 
   Future<({int fact, int plan})> _getStudentsCount() async {
-    final data = await client.getCountReport(school.id);
+    final data = await client.getCountReport(widget.school.id);
 
     final result = data.answer.data.classes.fold(
         (fact: 0, plan: 0),
@@ -93,72 +100,35 @@ class SchoolDetailsPage extends StatelessWidget {
       '${countData.fact}',
       '${countData.plan} человек',
       '${countData.plan - countData.fact} человек',
-      '${stats[Indicator.komplekt]![school]}%',
-      '${stats[Indicator.averageGrade]![school]}',
-      '${stats[Indicator.intensity]![school]}%',
-      '${stats[Indicator.plan]![school]}%',
-      '${stats[Indicator.commentsGrades]![school]}%',
-      '${stats[Indicator.elMaterials]![school]}%',
-      '${stats[Indicator.events]![school]}',
+      '${stats[Indicator.komplekt]![widget.school]}%',
+      '${stats[Indicator.averageGrade]![widget.school]}',
+      '${stats[Indicator.intensity]![widget.school]}%',
+      '${stats[Indicator.plan]![widget.school]}%',
+      '${stats[Indicator.commentsGrades]![widget.school]}%',
+      '${stats[Indicator.elMaterials]![widget.school]}%',
+      '${stats[Indicator.events]![widget.school]}',
     ];
+
+    final style = Theme.of(context).textTheme.bodyLarge;
 
     return Column(
       children: [
-        Expanded(child: Text(data.info.address.replaceAll('\n', ''))),
+        Text(
+          data.info.address.replaceAll('\n', ''),
+          style: style,
+        ),
         Expanded(
           flex: 2,
-          child: Row(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: captions
-                            .take(6)
-                            .map((e) => Text(e, maxLines: 1))
-                            .toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 35),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: values
-                            .take(6)
-                            .map((e) => Text(e, maxLines: 1))
-                            .toList(),
-                      ),
-                    )
-                  ],
-                ),
+              Row(
+                children: [
+                  _dataColumn(captions.take(6).toList(), style,
+                      values.take(6).toList()),
+                  _dataColumn(captions.sublist(6), style, values.sublist(6))
+                ],
               ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: captions
-                            .sublist(6)
-                            .map((e) => Text(e, maxLines: 1))
-                            .toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 35),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: values
-                            .sublist(6)
-                            .map((e) => Text(e, maxLines: 1))
-                            .toList(),
-                      ),
-                    )
-                  ],
-                ),
-              )
             ],
           ),
         ),
@@ -166,6 +136,37 @@ class SchoolDetailsPage extends StatelessWidget {
           child: _administrationGrid(data),
         )
       ],
+    );
+  }
+
+  Expanded _dataColumn(
+      List<String> captions, TextStyle? style, List<String> values) {
+    return Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: captions
+                  .map((e) => Text('$e:', maxLines: 1, style: style))
+                  .toList(),
+            ),
+          ),
+          const SizedBox(width: 35),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: values
+                  .map((e) => Text(
+                        e,
+                        maxLines: 1,
+                        style: style,
+                      ))
+                  .toList(),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -196,21 +197,34 @@ class SchoolDetailsPage extends StatelessWidget {
                   .sublist(2)
                   .map((e) => Expanded(child: _administrationEntry(e)))
                   .toList()),
+        ),
+        const Expanded(
+          child: SizedBox(),
         )
       ],
     );
   }
 
   Widget _administrationEntry(PhonebookContact e) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 64.0,
-          backgroundImage: NetworkImage(
-              'https://wq.lms-school.ru/?action=pub_image&person=${e.mid}&base=${school.dbName}'),
-        ),
-        Text('${e.bookEntry}\n${e.fio.split(' ').join('\n')}'),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          CroppedAvatar(
+              photoUrl: 'https://wq.lms-school.ru/?action=consolidated.photo'
+                  '&base=cons'
+                  '&login=${AppSettings.consolidatedLogin!}'
+                  '&pass=${AppSettings.consolidatedPassword}'
+                  '&student=${e.mid}'),
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0),
+            child: Text(
+              '${e.bookEntry}\n${e.fio.split(' ').join('\n')}\n${e.workPhone.isEmpty ? e.mobilePhone : e.workPhone}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

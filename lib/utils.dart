@@ -39,6 +39,9 @@ extension TimeOfDayFormat on TimeOfDay {
 extension ScheduleDataFormat on DateTime {
   static final _format = DateFormat.yMMMEd('ru_RU');
   String get scheduleDate => _format.format(this);
+
+  bool isSameDay(DateTime other) =>
+      other.day == day && other.month == month && other.year == year;
 }
 
 class ReloadableFutureBuilder<T> extends StatefulWidget {

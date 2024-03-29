@@ -6,6 +6,8 @@ import 'report.dart';
 import 'schedule.dart';
 import 'stats.dart';
 import 'student.dart';
+import 'teacher_schedule.dart';
+import 'terms.dart';
 import 'weeks.dart';
 import 'phonebook.dart';
 import 'count.dart';
@@ -97,6 +99,23 @@ abstract class BaseClient {
   Future<ScheduleResponse> getFullSchedule(
     @Query('variant') String variant,
     @Query('base') String dbName,
+  );
+
+  @GET('/?format=json&action=teacherjournal&type=teacher')
+  Future<TeacherJournalApiResponse> getJournal(
+    @Query('period') String period,
+    @Query('course') String course,
+    @Query('group') String group,
+    @Query('base') String dbName,
+    @Query('login') String login,
+    @Query('pass') String password,
+  );
+
+  @GET('/?format=json&action=terms&type=teacher')
+  Future<TermsApiResponse> getTerms(
+    @Query('base') String dbName,
+    @Query('login') String login,
+    @Query('pass') String password,
   );
 }
 

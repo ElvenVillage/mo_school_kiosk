@@ -70,8 +70,12 @@ class Student {
 
   String get fio => '$lastName\n$firstName\n$patronymic';
 
-  String photoUrl(String login, String password) =>
-      'https://wq.lms-school.ru/?action=consolidated.photo&base=cons&login=$login&pass=$password&student=$id';
+  String photoUrl(String login, String password) => 'https://wq.lms-school.ru/'
+      '?action=consolidated.photo'
+      '&base=cons'
+      '&login=$login'
+      '&pass=$password'
+      '&student=$id';
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)

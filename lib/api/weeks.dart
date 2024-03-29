@@ -15,6 +15,9 @@ class WeeksData {
   final String outScheduleVariant;
   final String current;
 
+  DateTime get start => DateTime.parse(weekStart);
+  DateTime get end => DateTime.parse(weekEnd);
+
   @override
   int get hashCode => week.hashCode;
 

@@ -4,7 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/schedule.dart';
+import 'package:mo_school_kiosk/api/teacher_schedule.dart';
+import 'package:mo_school_kiosk/api/terms.dart';
 import 'package:mo_school_kiosk/api/weeks.dart';
+import 'package:mo_school_kiosk/settings.dart';
+import 'package:mo_school_kiosk/utils.dart';
 import 'package:rxdart/subjects.dart';
 
 typedef ScheduleData = Map<String, List<LessonData>>;
@@ -34,6 +38,8 @@ class ScheduleProvider extends ChangeNotifier {
   final _groupsMemCache = <WeeksData, List<GroupData>>{};
   final _teachersMemCache = <WeeksData, List<TeacherData>>{};
   final _roomsMemCache = <WeeksData, List<RoomData>>{};
+
+  final _terms = <TermsApiData>[];
 
   final List<WeeksData> weeks = [];
 
@@ -72,8 +78,37 @@ class ScheduleProvider extends ChangeNotifier {
     });
   }
 
-  void init() {
-    fetchWeeks();
+  static final _journals = <String, Future<TeacherJournalApiResponse>>{};
+
+  Future<({String topic, String homework})?> getDetails(
+      DateTime date, LessonData lesson) async {
+    final currentPeriod = _terms.firstWhereOrNull((e) =>
+        e.start.isBefore(date.subtract(const Duration(days: 7))) &&
+        e.end.isAfter(date.add(const Duration(days: 7))));
+    if (currentPeriod == null) return null;
+
+    final key = currentPeriod.id + lesson.course + lesson.group;
+
+    final journalFuture = _journals[key] ??= baseClient.getJournal(
+      currentPeriod.id,
+      lesson.course,
+      lesson.group,
+      dbName,
+      AppSettings.baseLogin!,
+      AppSettings.basePassword!,
+    );
+
+    final journal = await journalFuture;
+
+    final journalEntry = journal.answer.data?.dates
+        .firstWhereOrNull((e) => e.startDate.isSameDay(date));
+
+    if (journalEntry == null) return null;
+    return (topic: journalEntry.theme, homework: journalEntry.homework);
+  }
+
+  void init() async {
+    await fetchWeeks();
 
     _sub = selectedWeek.listen((week) async {
       schedule.add(null);
@@ -157,8 +192,14 @@ class ScheduleProvider extends ChangeNotifier {
     try {
       groups.add(null);
       final fetchedWeeks = await client.getWeeks(dbName);
+      final terms = await client.getTerms(
+        dbName,
+        AppSettings.baseLogin!,
+        AppSettings.basePassword!,
+      );
 
       weeks.addAll(fetchedWeeks.answer.data!);
+      _terms.addAll(terms.answer.data!);
 
       selectedWeek.add(weeks.firstWhere((e) => e.current == '1'));
     } catch (e) {

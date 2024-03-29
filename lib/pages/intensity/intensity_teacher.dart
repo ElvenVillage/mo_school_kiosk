@@ -4,6 +4,7 @@ import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
+import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 import 'package:mo_school_kiosk/widgets/school_logo.dart';
 
@@ -68,11 +69,13 @@ class IntensityTeacher extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircleAvatar(
-                              radius: 64.0,
-                              backgroundImage: NetworkImage(
-                                  'https://wq.lms-school.ru/?action=consolidated.photo&student=${subject.value.id}&login=nnz&pass=Sonyk12345678&base=cons'),
-                            ),
+                            CroppedAvatar(
+                                photoUrl: 'https://wq.lms-school.ru/'
+                                    '?action=consolidated.photo'
+                                    '&student=${subject.value.id}'
+                                    '&login=nnz'
+                                    '&pass=Sonyk12345678'
+                                    '&base=cons'),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(

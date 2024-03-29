@@ -7,6 +7,7 @@ import 'package:mo_school_kiosk/schedule/schedule_provider.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/base_grid.dart';
+import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 import 'package:provider/provider.dart';
 
@@ -130,7 +131,21 @@ class ScheduleList extends StatefulWidget {
 
 class _ScheduleListState extends State<ScheduleList> {
   final _daysOfWeek = [for (var i = 1; i < 7; i++) i.toString()];
-  var _selectedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  void initState() {
+    widget.provider.selectedWeek.first.then((week) {
+      final now = DateTime.now();
+      setState(() {
+        _selectedDay = (week.start.isBefore(now) && week.end.isAfter(now))
+            ? now
+            : week.start;
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageTemplate(
@@ -175,7 +190,7 @@ class _ScheduleListState extends State<ScheduleList> {
                                           ?.where((k) => k.dayOfWeek == e) ??
                                       [])));
                           final day =
-                              data[_selectedDay.weekday.toString()] ?? [];
+                              data[_selectedDay?.weekday.toString()] ?? [];
 
                           return Builder(
                             builder: (_) {
@@ -200,7 +215,7 @@ class _ScheduleListState extends State<ScheduleList> {
                               return ListView(
                                 children: [
                                   Text(
-                                    _selectedDay.scheduleDate,
+                                    _selectedDay?.scheduleDate ?? '',
                                     style: context.headlineMedium,
                                   ),
                                   for (final period in allPeriods)
@@ -210,6 +225,8 @@ class _ScheduleListState extends State<ScheduleList> {
                                       child: _LessonCard(
                                           key: Key(period),
                                           lessons: lessons,
+                                          selectedDay:
+                                              _selectedDay ?? DateTime.now(),
                                           period: period,
                                           provider: widget.provider),
                                     )
@@ -239,9 +256,10 @@ class _ScheduleListState extends State<ScheduleList> {
   }
 
   void _prev() {
+    if (_selectedDay == null) return;
     setState(() {
-      final newDay = _selectedDay.subtract(const Duration(days: 1));
-      if ((newDay.weekday - _selectedDay.weekday).abs() > 1) {
+      final newDay = _selectedDay!.subtract(const Duration(days: 1));
+      if ((newDay.weekday - _selectedDay!.weekday).abs() > 1) {
         widget.provider.prevWeek();
       }
       _selectedDay = newDay;
@@ -249,9 +267,10 @@ class _ScheduleListState extends State<ScheduleList> {
   }
 
   void _next() {
+    if (_selectedDay == null) return;
     setState(() {
-      final newDay = _selectedDay.add(const Duration(days: 1));
-      if ((newDay.weekday - _selectedDay.weekday).abs() > 1) {
+      final newDay = _selectedDay!.add(const Duration(days: 1));
+      if ((newDay.weekday - _selectedDay!.weekday).abs() > 1) {
         widget.provider.nextWeek();
       }
       _selectedDay = newDay;
@@ -265,11 +284,13 @@ class _LessonCard extends StatelessWidget {
     required this.lessons,
     required this.period,
     required this.provider,
+    required this.selectedDay,
   });
 
   final Map<String, List<LessonData>> lessons;
   final String period;
   final ScheduleProvider provider;
+  final DateTime selectedDay;
 
   @override
   Widget build(BuildContext context) {
@@ -299,10 +320,12 @@ class _LessonCard extends StatelessWidget {
           onTap: lesson.isEmpty
               ? null
               : () {
-                  final teachers = provider.teachers.value;
-                  final rooms = provider.rooms.value;
                   _showLessonDialog(
-                      context, lesson, teachers, rooms, periodData);
+                    context,
+                    lesson,
+                    periodData,
+                    provider,
+                  );
                 },
           child: Card(
             color: AppColors.secondary.withAlpha(50),
@@ -384,8 +407,15 @@ class _LessonCard extends StatelessWidget {
     });
   }
 
-  Future<void> _showLessonDialog(BuildContext context, List<LessonData> lesson,
-      List<TeacherData> teachers, List<RoomData> rooms, PeriodData periodData) {
+  Future<void> _showLessonDialog(
+    BuildContext context,
+    List<LessonData> lesson,
+    PeriodData periodData,
+    ScheduleProvider provider,
+  ) {
+    final teachers = provider.teachers.value;
+    final rooms = provider.rooms.value;
+
     return showDialog(
         context: context,
         builder: (_) {
@@ -399,51 +429,112 @@ class _LessonCard extends StatelessWidget {
                       .firstWhereOrNull((teacher) => teacher.id == e.teacher);
                   final room =
                       rooms.firstWhereOrNull((room) => room.id == e.room);
-                  return ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 900),
-                    child: Card(
-                      color: AppColors.darkGreen,
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: CircleAvatar(
-                                radius: 64.0,
-                                backgroundImage: NetworkImage(
-                                    'https://wq.lms-school.ru/?action=pub_image&person=${teacher?.id}&base=${provider.dbName}'),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    title: Text(
-                                      e.title,
-                                      style: context.headlineMedium,
-                                    ),
-                                    trailing: Text(
-                                      '${periodData.periodFormatted}\n${periodData.name}\n${room?.name}',
-                                      style: context.body,
-                                    ),
-                                  ),
-                                  ListTile(
-                                    title: Text(
-                                      '${teacher?.fio}\n${lesson.first.course}',
-                                      style: context.body,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  return _LessonDetailsCard(
+                    teacher: teacher,
+                    selectedDay: selectedDay,
+                    room: room,
+                    provider: provider,
+                    periodData: periodData,
+                    lesson: e,
                   );
                 }).toList()),
           );
         });
+  }
+}
+
+class _LessonDetailsCard extends StatelessWidget {
+  const _LessonDetailsCard({
+    required this.teacher,
+    required this.selectedDay,
+    required this.periodData,
+    required this.lesson,
+    required this.provider,
+    required this.room,
+  });
+
+  final TeacherData? teacher;
+  final ScheduleProvider provider;
+  final DateTime selectedDay;
+  final RoomData? room;
+  final LessonData lesson;
+  final PeriodData periodData;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 900),
+      child: Card(
+        color: AppColors.darkGreen,
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Row(
+            children: [
+              Expanded(
+                  child: CroppedAvatar(
+                photoUrl: 'https://wq.lms-school.ru/'
+                    '?action=pub_image'
+                    '&person=${teacher?.id}'
+                    '&base=${provider.dbName}',
+              )),
+              Expanded(
+                flex: 4,
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        '\n${lesson.title}',
+                        style: context.headlineMedium,
+                      ),
+                    ),
+                    ListTile(
+                      title: Text(
+                        '${teacher?.fio}',
+                        style: context.body,
+                      ),
+                    ),
+                    FutureBuilder(
+                      future: provider.getDetails(selectedDay, lesson),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.data == null) {
+                          return const Text('');
+                        }
+
+                        final topic = snapshot.data?.topic;
+                        final homework = snapshot.data?.homework;
+
+                        return ListTile(
+                          subtitle: Text('ДЗ: $homework', style: context.body),
+                          title: Text('Тема:$topic\n', style: context.body),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        '${periodData.periodFormatted}\n${periodData.name}\nкаб. ${room?.shortName}',
+                        style: context.body,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/groups.dart';
@@ -9,9 +7,8 @@ import 'package:mo_school_kiosk/settings.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/base_card.dart';
+import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
-import 'package:image/image.dart' as image;
-import 'package:http/http.dart' as http;
 
 class SelectStudentPage extends StatelessWidget {
   const SelectStudentPage(this.school, this.group, {super.key});
@@ -21,15 +18,6 @@ class SelectStudentPage extends StatelessWidget {
 
   static Route route(School school, Group group) =>
       createRoute((_) => SelectStudentPage(school, group));
-
-  Future<Uint8List> _cropImage(Student student) async {
-    final data = await http.get(Uri.parse(student.photoUrl(
-        AppSettings.consolidatedLogin!, AppSettings.consolidatedPassword!)));
-    final img = image.decodeImage(data.bodyBytes);
-    final expandedImg = image.copyExpandCanvas(img!, padding: 100);
-    final croppedImage = image.copyCropCircle(expandedImg);
-    return image.encodePng(croppedImage);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,21 +64,13 @@ class SelectStudentPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 SizedBox(
-                                  height: 128,
-                                  width: 128,
-                                  child: FutureBuilder(
-                                      future: _cropImage(student),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return const Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
-                                        return Image.memory(
-                                          snapshot.data!,
-                                        );
-                                      }),
-                                ),
+                                    height: 128,
+                                    width: 128,
+                                    child: CroppedAvatar(
+                                        photoUrl: student.photoUrl(
+                                            AppSettings.consolidatedLogin!,
+                                            AppSettings
+                                                .consolidatedPassword!))),
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(
                                       24.0, 0.0, 8.0, 36.0),

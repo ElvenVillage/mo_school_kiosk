@@ -218,37 +218,3 @@ class ScheduleResponse {
 
   ScheduleResponse({required this.answer});
 }
-
-@JsonSerializable()
-class Dish {
-  @JsonKey(name: 'xp_Key')
-  final String xpKey;
-  @JsonKey(name: 'Name')
-  final String name;
-  @JsonKey(name: 'Exit_period')
-  final String volume;
-  @JsonKey(name: 'EdIzm_period')
-  final String measure;
-  @JsonKey(name: 'Price')
-  final String price;
-  @JsonKey(name: 'ShowPrice')
-  final String showPrice;
-  @JsonKey(name: 'kcal')
-  final String calories;
-  final String hasPhoto;
-
-  bool get showPhoto => hasPhoto == '1';
-  bool get hasPrice => showPrice == '1';
-
-  factory Dish.fromJson(Map<String, dynamic> json) => _$DishFromJson(json);
-
-  Dish(
-      {required this.xpKey,
-      required this.name,
-      required this.volume,
-      required this.measure,
-      required this.price,
-      required this.showPrice,
-      required this.calories,
-      required this.hasPhoto});
-}
