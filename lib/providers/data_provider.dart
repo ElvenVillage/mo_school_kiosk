@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mo_school_kiosk/api/api.dart';
@@ -56,6 +57,8 @@ enum ReportIndicator {
 class StatsProvider extends ChangeNotifier {
   Timer? _timer;
 
+  var _loading = false;
+
   Map<School, num?> getData(Map<School, List<StatsData>> data, Indicator ind) {
     return data.map((key, value) => MapEntry(
         key,
@@ -90,6 +93,9 @@ class StatsProvider extends ChangeNotifier {
   }
 
   Future<void> load() async {
+    if (_loading) return;
+    _loading = true;
+
     try {
       final data = await client.getStats();
 
@@ -109,6 +115,11 @@ class StatsProvider extends ChangeNotifier {
       error = '';
       notifyListeners();
       await loadReports();
+      _loading = false;
+    } on DioException catch (e) {
+      error = e.error?.toString() ?? 'Не удалось загрузить данные';
+      notifyListeners();
+      load();
     } catch (e) {
       error = e.toString();
       notifyListeners();
@@ -124,6 +135,10 @@ class StatsProvider extends ChangeNotifier {
         reports[school] = response.answer.data;
 
         notifyListeners();
+      } on DioException catch (e) {
+        error = e.error?.toString() ?? 'Не удалось загрузить данные';
+        notifyListeners();
+        load();
       } catch (e) {
         error = e.toString();
       }

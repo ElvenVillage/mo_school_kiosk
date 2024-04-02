@@ -15,14 +15,20 @@ dependencies:
   dio: ^5.4.0
   flutter:
     sdk: flutter
+  flutter_map: ^3.0.0
   flutter_widget_from_html_core: ^0.14.11
   google_fonts: ^4.0.4
   html: ^0.15.4
-  http: ^1.2.1
+  http: ^0.13.3
   image: ^4.1.7
   infinite_carousel: ^1.1.1
-  intl: ^0.19.0
+  intl: ^0.18.1
   json_annotation: ^4.8.1
+  latlong2: ^0.8.1
+  map_controller_plus:
+    git:
+      ref: e3618b2
+      url: https://github.com/ElvenVillage/map_controller_plus.git
   provider: ^6.1.1
   retrofit: ^4.0.3
   rxdart: ^0.27.7
@@ -36,6 +42,15 @@ dev_dependencies:
     sdk: flutter
   json_serializable: ^6.7.1
   retrofit_generator: ^8.0.6
+
+dependency_overrides:
+  latlong2:
+    git:
+      url: https://github.com/ElvenVillage/dart-latlong.git
+  flutter_map:
+    git:
+      url: https://github.com/ElvenVillage/flutter_map.git
+      ref: labels
 
 flutter:
 

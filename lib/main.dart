@@ -343,8 +343,8 @@ class _AppState extends State<App> {
             ),
             Builder(builder: (context) {
               final provider = context.watch<StatsProvider>();
-
-              if (provider.stats.isEmpty) {
+// TODO
+              if (provider.stats.isEmpty && false) {
                 return Container(
                   color: Colors.grey.withAlpha(100),
                   width: double.maxFinite,
@@ -354,12 +354,28 @@ class _AppState extends State<App> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (provider.error.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(provider.error),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text('Ошибка: ${provider.error}'),
+                                MaterialButton(
+                                  onPressed: provider.load,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Повторить попытку'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      const CircularProgressIndicator(
-                        color: Colors.white,
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   )),

@@ -1,50 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mo_school_kiosk/api/schools.dart';
-import 'package:mo_school_kiosk/content/school_details_page.dart';
+import 'package:mo_school_kiosk/content/model.dart';
+import 'package:mo_school_kiosk/content/schools_list_page.dart';
 import 'package:mo_school_kiosk/style.dart';
-import 'package:mo_school_kiosk/utils.dart';
-import 'package:mo_school_kiosk/widgets/base_grid.dart';
-import 'package:mo_school_kiosk/widgets/page_template.dart';
-
-class _SchoolModel {
-  final String name;
-  final String assetName;
-  final String id;
-
-  factory _SchoolModel.fromJson(Map<String, dynamic> json) => _SchoolModel(
-      json['name'], 'assets/logos/${json["logo"]}.png', json['id']);
-
-  const _SchoolModel(this.name, this.assetName, this.id);
-}
-
-class _StructureModel {
-  final String name;
-  final String asset;
-  final int count;
-
-  static final _digitsRegex = RegExp(r'[^0-9]');
-
-  final List<_SchoolModel>? schools;
-
-  factory _StructureModel.fromJson(Map<String, dynamic> json) {
-    final String title = json['title'];
-
-    final match = _digitsRegex.firstMatch(title)!;
-
-    final count = int.parse(title.substring(0, match.end).trim());
-
-    final schools = (json['schools'] as List)
-        .map<_SchoolModel>((e) => _SchoolModel.fromJson(e))
-        .toList();
-
-    return _StructureModel(title.replaceAll(count.toString(), "").trim(),
-        'assets/schools/${json["logo"]}.png', count, schools);
-  }
-
-  const _StructureModel(this.name, this.asset, this.count, [this.schools]);
-}
 
 class _StructureBaselinePainter extends CustomPainter {
   @override
@@ -78,16 +37,31 @@ class MainStructure extends StatefulWidget {
 }
 
 class _MainStructureState extends State<MainStructure> {
-  Future<List<_StructureModel>>? _data;
+  Future<List<StructureModel>>? _data;
 
-  Future<List<_StructureModel>> _loadSchools(BuildContext context) async {
-    final rawData =
-        await DefaultAssetBundle.of(context).loadString('assets/schools.json');
+  Future<List<StructureModel>> _loadSchools(BuildContext context) async {
+    final bundle = DefaultAssetBundle.of(context);
+
+    final rawData = await bundle.loadString('assets/schools.json');
     final data = (jsonDecode(rawData) as List)
-        .map<_StructureModel>((e) => _StructureModel.fromJson(e))
+        .map<StructureModel>((e) => StructureModel.fromJson(e))
         .toList();
+
+    final rawCitiesData = await bundle.loadString('assets/cities.json');
+
+    final cities = (jsonDecode(rawCitiesData) as Map).map((key, value) =>
+        MapEntry(key.toString(), CityModel.fromJson(key, value)));
+
+    for (final schoolList in data) {
+      for (final school in schoolList.schools ?? <SchoolModel>[]) {
+        if (cities.containsKey(school.city)) {
+          school.coords = cities[school.city]!;
+        }
+      }
+    }
+
     return [
-      _StructureModel('образовательные организации', 'assets/schools/obrmo.png',
+      StructureModel('образовательные организации', 'assets/schools/obrmo.png',
           33, [...data.expand((e) => e.schools ?? [])]),
       ...data
     ];
@@ -128,7 +102,7 @@ class _MainStructureState extends State<MainStructure> {
 class _StructureCard extends StatelessWidget {
   const _StructureCard(this.model);
 
-  final _StructureModel model;
+  final StructureModel model;
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +110,7 @@ class _StructureCard extends StatelessWidget {
       child: InkWell(
         onTap: (model.schools?.isNotEmpty ?? false)
             ? () {
-                Navigator.of(context).push(_SchoolsListPage.route(model));
+                Navigator.of(context).push(SchoolsListPage.route(model));
               }
             : null,
         child: Padding(
@@ -166,33 +140,6 @@ class _StructureCard extends StatelessWidget {
                         ],
                       )))
             ])),
-      ),
-    );
-  }
-}
-
-class _SchoolsListPage extends StatelessWidget {
-  const _SchoolsListPage(this.data);
-
-  final _StructureModel data;
-
-  static Route route(_StructureModel data) =>
-      createRoute((_) => _SchoolsListPage(data));
-
-  @override
-  Widget build(BuildContext context) {
-    return PageTemplate(
-      title: '${data.count} ${data.name}',
-      body: BaseGrid(
-        onTap: (school) {
-          Navigator.of(context).push(SchoolDetailsPage.route(school));
-        },
-        schools: data.schools?.map((e) {
-              final segments = e.assetName.split('/');
-              final dbName = segments.last.replaceAll('.png', '');
-              return School(id: e.id, name: e.name, dbName: dbName);
-            }).toList() ??
-            const [],
       ),
     );
   }

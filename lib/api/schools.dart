@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mo_school_kiosk/content/model.dart';
 import 'package:mo_school_kiosk/utils.dart';
 
 part 'schools.g.dart';
@@ -23,6 +24,9 @@ class School {
       'https://wq.lms-school.ru/?action=kiosklogo&base=$dbName';
   String get pngUrl =>
       'https://wq.lms-school.ru/?action=kiosklogopng&base=$dbName';
+
+  factory School.fromSchoolModel(SchoolModel model) =>
+      School(id: model.id, name: model.name, dbName: model.assetName);
 
   @override
   bool operator ==(Object other) => other is School && id == other.id;

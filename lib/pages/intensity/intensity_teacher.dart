@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/settings.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
@@ -73,8 +74,8 @@ class IntensityTeacher extends StatelessWidget {
                                 photoUrl: 'https://wq.lms-school.ru/'
                                     '?action=consolidated.photo'
                                     '&student=${subject.value.id}'
-                                    '&login=nnz'
-                                    '&pass=Sonyk12345678'
+                                    '&login=${AppSettings.consolidatedLogin}'
+                                    '&pass=${AppSettings.consolidatedPassword}'
                                     '&base=cons'),
                             Padding(
                               padding: const EdgeInsets.all(16.0),

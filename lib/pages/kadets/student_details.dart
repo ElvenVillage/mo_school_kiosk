@@ -3,6 +3,7 @@ import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/groups.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/api/student.dart';
+import 'package:mo_school_kiosk/settings.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/lms_appbar.dart';
@@ -43,8 +44,9 @@ class StudentDetailsPage extends StatelessWidget {
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.all(24.0),
-                                child: Image.network(
-                                    student.photoUrl('nnz', 'Sonyk12345678')),
+                                child: Image.network(student.photoUrl(
+                                    AppSettings.consolidatedLogin!,
+                                    AppSettings.consolidatedPassword!)),
                               ),
                             ),
                             Expanded(
