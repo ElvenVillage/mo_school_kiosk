@@ -354,19 +354,12 @@ class _AppState extends State<App> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (provider.error.isNotEmpty)
-                        Card(
+                        const Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: EdgeInsets.all(16.0),
                             child: Column(
                               children: [
-                                Text('Ошибка: ${provider.error}'),
-                                MaterialButton(
-                                  onPressed: provider.load,
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('Повторить попытку'),
-                                  ),
-                                ),
+                                Text('Не удалось загрузить данные'),
                               ],
                             ),
                           ),

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/phonebook.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/pages/kadets/select_group.dart';
+import 'package:mo_school_kiosk/pages/news_screen.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/schedule/schedule.dart';
 import 'package:mo_school_kiosk/settings.dart';
+import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/cropped_avatar.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
@@ -97,11 +101,13 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
     final values = [
       data.info.phone,
       data.info.phone,
-      '${countData.fact}',
+      '${countData.fact} человек',
       '${countData.plan} человек',
       '${countData.plan - countData.fact} человек',
-      '${stats[Indicator.komplekt]![widget.school]}%',
-      '${stats[Indicator.averageGrade]![widget.school]}',
+      stats[Indicator.komplekt]![widget.school] == null
+          ? 'Нет данных'
+          : '${stats[Indicator.komplekt]![widget.school]}%',
+      '${(stats[Indicator.averageGrade]![widget.school]?.toStringAsFixed(2))?.replaceAll('.', ',')}',
       '${stats[Indicator.intensity]![widget.school]}%',
       '${stats[Indicator.plan]![widget.school]}%',
       '${stats[Indicator.commentsGrades]![widget.school]}%',
@@ -109,7 +115,7 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
       '${stats[Indicator.events]![widget.school]}',
     ];
 
-    final style = Theme.of(context).textTheme.bodyLarge;
+    final style = Theme.of(context).textTheme.titleLarge;
 
     return Column(
       children: [
@@ -125,14 +131,16 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
               Row(
                 children: [
                   _dataColumn(captions.take(6).toList(), style,
-                      values.take(6).toList()),
-                  _dataColumn(captions.sublist(6), style, values.sublist(6))
+                      values.take(6).toList(), true),
+                  _dataColumn(
+                      captions.sublist(6), style, values.sublist(6), true)
                 ],
               ),
             ],
           ),
         ),
         Expanded(
+          flex: 2,
           child: _administrationGrid(data),
         )
       ],
@@ -140,27 +148,35 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
   }
 
   Expanded _dataColumn(
-      List<String> captions, TextStyle? style, List<String> values) {
+      List<String> captions, TextStyle? style, List<String> values, bool left) {
     return Expanded(
       child: Row(
         children: [
           Expanded(
+            flex: left ? 2 : 1,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: captions
-                  .map((e) => Text('$e:', maxLines: 1, style: style))
+                  .map((e) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('$e:', maxLines: 1, style: style),
+                      ))
                   .toList(),
             ),
           ),
           const SizedBox(width: 35),
           Expanded(
+            flex: left ? 1 : 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: values
-                  .map((e) => Text(
-                        e,
-                        maxLines: 1,
-                        style: style,
+                  .map((e) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          e,
+                          maxLines: 1,
+                          style: style,
+                        ),
                       ))
                   .toList(),
             ),
@@ -178,9 +194,14 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
       'Заместитель НУ (по воспитательной работе)'
     ].map((e) => e.toLowerCase());
 
-    final administration = data.phones
+    final List<PhonebookContact?> administration = data.phones
         .where((e) => administrationEntries.contains(e.bookEntry.toLowerCase()))
         .toList();
+
+    if (administration.length < 4) {
+      administration.addAll(List.filled(
+          administrationEntries.length - administration.length, null));
+    }
 
     return Row(
       children: [
@@ -198,32 +219,108 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
                   .map((e) => Expanded(child: _administrationEntry(e)))
                   .toList()),
         ),
-        const Expanded(
-          child: SizedBox(),
-        )
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _RoundButton(
+                caption: 'НОВОСТИ',
+                size: 95,
+                onTap: () {
+                  Navigator.of(context).push(NewsScreen.route(widget.school));
+                },
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _RoundButton(
+                    caption: 'РАСПИСАНИЕ',
+                    size: 120,
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(ScheduleGroupsPage.route(widget.school));
+                    },
+                  ),
+                  const SizedBox(width: 15),
+                  _RoundButton(
+                    caption: 'ЛИЧНЫЕ ДЕЛА',
+                    size: 85,
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(SelectGroupPage.route(widget.school));
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+        ))
       ],
     );
   }
 
-  Widget _administrationEntry(PhonebookContact e) {
+  Widget _administrationEntry(PhonebookContact? e) {
+    if (e == null) return const SizedBox();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          CroppedAvatar(
-              photoUrl: 'https://wq.lms-school.ru/?action=consolidated.photo'
-                  '&base=cons'
-                  '&login=${AppSettings.consolidatedLogin!}'
-                  '&pass=${AppSettings.consolidatedPassword}'
-                  '&student=${e.mid}'),
           Padding(
-            padding: const EdgeInsets.only(left: 32.0),
-            child: Text(
-              '${e.bookEntry}\n${e.fio.split(' ').join('\n')}\n${e.workPhone.isEmpty ? e.mobilePhone : e.workPhone}',
-              style: Theme.of(context).textTheme.titleMedium,
+            padding: const EdgeInsets.all(16.0),
+            child: CroppedAvatar(
+                photoUrl: 'https://wq.lms-school.ru/?action=consolidated.photo'
+                    '&base=cons'
+                    '&login=${AppSettings.consolidatedLogin!}'
+                    '&pass=${AppSettings.consolidatedPassword}'
+                    '&student=${e.mid}'),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 32.0),
+              child: Text(
+                '${e.bookEntry}\n${e.fio.split(' ').join('\n')}\n${e.workPhone.isEmpty ? e.mobilePhone : e.workPhone}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({
+    required this.caption,
+    required this.onTap,
+    required this.size,
+  });
+
+  final String caption;
+  final void Function() onTap;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipOval(
+        child: Container(
+          width: size,
+          height: size,
+          decoration:
+              const BoxDecoration(color: Color.fromARGB(255, 219, 219, 219)),
+          child: Center(
+              child: Text(
+            caption,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.darkGreen),
+          )),
+        ),
       ),
     );
   }

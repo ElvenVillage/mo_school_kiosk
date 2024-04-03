@@ -146,7 +146,6 @@ class StatsProvider extends ChangeNotifier {
     for (final school in schools) {
       while (true) {
         try {
-          LmsLogger().log.i('loading GeneralStatisticOne for ${school.dbName}');
           final response = await client.getReport(school.id, date);
           reports[school] = response.answer.data;
 

@@ -6,13 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
+import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsScreen extends StatefulWidget {
-  const NewsScreen({super.key});
+  const NewsScreen({super.key, this.school});
+
+  final School? school;
 
   static const rssUrls = {
     'akkde': 'http://adekkk.mil.ru/More/Novosti/rss',
@@ -48,7 +51,8 @@ class NewsScreen extends StatefulWidget {
     'pansion2': 'http://spb.pansion.mil.ru/more/Novosti/rss',
   };
 
-  static Route route() => createRoute((_) => const NewsScreen());
+  static Route route([School? school]) =>
+      createRoute((_) => NewsScreen(school: school));
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -60,9 +64,12 @@ class _NewsScreenState extends State<NewsScreen> {
   Stream<List<RssItem>> _fetchNews() async* {
     _prefs ??= await SharedPreferences.getInstance();
 
+    final savedSchools = widget.school == null
+        ? NewsScreen.rssUrls.keys
+        : [widget.school!.dbName];
+
     final cachedResult = <RssItem>[];
 
-    final savedSchools = NewsScreen.rssUrls.values;
     for (final key in savedSchools) {
       final data = _prefs?.getString(key);
       if (data != null) {
@@ -78,9 +85,9 @@ class _NewsScreenState extends State<NewsScreen> {
 
     final result = <RssItem>[];
 
-    for (final school in NewsScreen.rssUrls.values) {
+    for (final school in savedSchools) {
       try {
-        final response = (await dio.get(school)).data;
+        final response = (await dio.get(NewsScreen.rssUrls[school]!)).data;
         result.addAll(RssFeed.parse(response).items);
         await _prefs?.setString(school, response.toString());
       } catch (_) {}

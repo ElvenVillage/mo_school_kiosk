@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/settings.dart';
 import 'package:mo_school_kiosk/style.dart';
-import 'package:path_provider/path_provider.dart';
 
 int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
   return ((b.value ?? 0.0) - (a.value ?? 0.0)).sign.toInt();
@@ -65,6 +65,15 @@ class _ReloadableFutureBuilderState<T>
   late Future<T> _future = widget.future();
 
   @override
+  void initState() {
+    super.initState();
+    _future.onError((error, stackTrace) {
+      LmsLogger().log.e('Error', error: error);
+      return Future.error(error!);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<T>(
       future: _future,
@@ -111,7 +120,6 @@ class LmsLogger {
   factory LmsLogger() => _instance ??= LmsLogger._internal();
 
   final log = Logger(
-    filter: ProductionFilter(),
     printer: PrettyPrinter(
       methodCount: 1,
       errorMethodCount: 6,
@@ -131,8 +139,8 @@ class _LogFileOutput extends LogOutput {
 
   @override
   void output(OutputEvent event) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    file ??= File('${directory.path}/.kiosk-dovuz.log');
+    final Directory directory = await AppSettings.getAppDirectory();
+    file ??= File('${directory.path}/log.txt');
 
     for (var line in event.lines) {
       await file?.writeAsString("${line.toString()}\n",

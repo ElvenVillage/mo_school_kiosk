@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 class AppSettings {
@@ -6,6 +5,19 @@ class AppSettings {
   static String? consolidatedPassword;
   static String? baseLogin;
   static String? basePassword;
+
+  static Future<Directory> getAppDirectory() async {
+    String home;
+    if (Platform.isWindows) {
+      home = Platform.environment['USERPROFILE']!;
+    } else {
+      home = Platform.environment['HOME']!;
+    }
+
+    final dir = Directory('$home/.kiosk_dovuz/');
+    await dir.create(recursive: true);
+    return dir;
+  }
 
   static Map<String, String> toJson() => {
         'consolidatedLogin': consolidatedLogin ?? 'nnz',
@@ -15,14 +27,9 @@ class AppSettings {
       };
 
   static Future<void> load() async {
-    String home;
-    if (Platform.isWindows) {
-      home = Platform.environment['USERPROFILE']!;
-    } else {
-      home = Platform.environment['HOME']!;
-    }
+    final directory = await getAppDirectory();
+    final settingsFile = File('${directory.path}/settings.ini');
 
-    final settingsFile = File('$home/.kiosk-dovuz');
     final wasInitialized = await settingsFile.exists();
 
     if (wasInitialized) {
@@ -33,17 +40,25 @@ class AppSettings {
   }
 
   static Future<void> _loadFromFile(File settingsFile) async {
-    final data = await settingsFile.readAsString();
-    final Map<String, dynamic> jsonData = jsonDecode(data);
-    consolidatedLogin = jsonData['consolidatedLogin'];
-    consolidatedPassword = jsonData['consolidatedPassword'];
-    baseLogin = jsonData['baseLogin'];
-    basePassword = jsonData['basePassword'];
+    final lines = await settingsFile.readAsLines();
+    final settings = <String, String>{};
+
+    for (final line in lines) {
+      final pair = line.split('=');
+      settings[pair.first] = pair.last;
+    }
+
+    consolidatedLogin = settings['consolidatedLogin'];
+    consolidatedPassword = settings['consolidatedPassword'];
+    baseLogin = settings['baseLogin'];
+    basePassword = settings['basePassword'];
   }
 
   static Future<void> _saveToFile(File settingsFile) async {
-    await settingsFile.create();
-    await settingsFile.writeAsString(jsonEncode(toJson()));
+    await settingsFile.create(recursive: true);
+
+    await settingsFile.writeAsString(
+        toJson().entries.map((e) => '${e.key}=${e.value}').join('\n'));
     await _loadFromFile(settingsFile);
   }
 }

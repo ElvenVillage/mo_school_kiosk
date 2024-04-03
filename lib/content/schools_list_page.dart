@@ -67,19 +67,19 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
     mapController = MapController();
 
     zoomSub = mapController.mapEventStream.listen((event) {
-      if (event.zoom > 5 && !namedMarkers) {
+      if (event.zoom > 4 && !namedMarkers) {
         setState(() {
           namedMarkers = true;
         });
-        _updateMarkers();
       }
 
-      if (event.zoom < 5 && namedMarkers) {
+      if (event.zoom < 4 && namedMarkers) {
         setState(() {
           namedMarkers = false;
         });
-        _updateMarkers();
       }
+
+      _updateMarkers();
     });
     statefulMapController = StatefulMapController(mapController: mapController);
 
@@ -142,13 +142,11 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
                             borderRadius: BorderRadius.circular(32.0)),
                         child: Row(
                           children: [
-                            Expanded(
-                                child: SchoolLogo(
+                            SchoolLogo(
                               school: model,
-                              radius: 32,
-                            )),
+                              radius: 36.0,
+                            ),
                             Expanded(
-                              flex: 3,
                               child: Text(
                                 model.name,
                                 style: const TextStyle(
@@ -187,8 +185,6 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
               builder: (_) => RadialMenu(
                     schools: city.value,
                     onToggle: () {
-                      // убрать остальные маркеры с числами
-                      // (ниже по z-уровню)
                       if (!_toggled) {
                         statefulMapController.removeMarkers(
                             names: entries
@@ -365,19 +361,18 @@ class _RadialAnimationState extends State<RadialAnimation> {
                     scale: widget.scale.value,
                     child: ClipOval(
                       child: Container(
-                        width: 11,
-                        height: 11,
+                        width: 12,
+                        height: 12,
                         color: Colors.white,
                       ),
                     )),
                 for (var i = 0; i < widget.schools.length; i++)
-                  _buildButton(360 / widget.schools.length * i,
-                      color: Colors.red, onTap: () {
+                  _buildButton(360 / widget.schools.length * i, onTap: () {
                     Navigator.of(context).push(SchoolDetailsPage.route(
                         School.fromSchoolModel(widget.schools[i])));
                   },
                       icon: SchoolLogo(
-                          radius: 36.0,
+                          radius: 42.0,
                           school: School.fromSchoolModel(widget.schools[i]))),
                 TapRegion(
                     onTapInside: (_) => _open(),
@@ -385,8 +380,8 @@ class _RadialAnimationState extends State<RadialAnimation> {
                     child: ClipOval(
                       child: Container(
                         padding: const EdgeInsets.all(16.0),
-                        height: 80,
-                        width: 80,
+                        height: 90,
+                        width: 90,
                         decoration: const BoxDecoration(color: Colors.white),
                         child: ClipOval(
                           child: Container(
@@ -424,8 +419,7 @@ class _RadialAnimationState extends State<RadialAnimation> {
     widget.toggle();
   }
 
-  Widget _buildButton(double angle,
-      {Color? color, Widget? icon, void Function()? onTap}) {
+  Widget _buildButton(double angle, {Widget? icon, void Function()? onTap}) {
     final double rad = radians(angle);
     return Transform(
         transform: Matrix4.identity()

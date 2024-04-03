@@ -59,7 +59,7 @@ class ScheduleProvider extends ChangeNotifier {
   final BaseClient client;
   final String dbName;
 
-  static const updateTimeout = Duration(minutes: 20);
+  static const updateTimeout = Duration(minutes: 30);
   static const debugUpdateTimeout = Duration(minutes: 10);
 
   StreamSubscription<WeeksData>? _sub;
@@ -89,6 +89,7 @@ class ScheduleProvider extends ChangeNotifier {
 
     final key = currentPeriod.id + lesson.course + lesson.group;
 
+    LmsLogger().log.i('loading journal ${currentPeriod.id} for $dbName');
     final journalFuture = _journals[key] ??= baseClient.getJournal(
       currentPeriod.id,
       lesson.course,
@@ -170,6 +171,8 @@ class ScheduleProvider extends ChangeNotifier {
       } catch (e) {
         groups.addError(e);
         periods.addError(e);
+
+        LmsLogger().log.e('Could not fetch journal', error: e);
       }
     });
   }
@@ -203,6 +206,7 @@ class ScheduleProvider extends ChangeNotifier {
 
       selectedWeek.add(weeks.firstWhere((e) => e.current == '1'));
     } catch (e) {
+      LmsLogger().log.e('Could not fetch weeks list', error: e);
       groups.addError(e);
     }
   }
