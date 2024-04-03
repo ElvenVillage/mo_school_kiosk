@@ -145,6 +145,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
                             Expanded(
                                 child: SchoolLogo(
                               school: model,
+                              radius: 32,
                             )),
                             Expanded(
                               flex: 3,
@@ -186,6 +187,8 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
               builder: (_) => RadialMenu(
                     schools: city.value,
                     onToggle: () {
+                      // убрать остальные маркеры с числами
+                      // (ниже по z-уровню)
                       if (!_toggled) {
                         statefulMapController.removeMarkers(
                             names: entries
@@ -324,7 +327,7 @@ class RadialAnimation extends StatefulWidget {
         ),
         scale = Tween<double>(
           begin: 1.0,
-          end: 30.0,
+          end: 25.0,
         ).animate(
           CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn),
         ),
@@ -362,8 +365,8 @@ class _RadialAnimationState extends State<RadialAnimation> {
                     scale: widget.scale.value,
                     child: ClipOval(
                       child: Container(
-                        width: 12,
-                        height: 12,
+                        width: 11,
+                        height: 11,
                         color: Colors.white,
                       ),
                     )),
@@ -376,16 +379,30 @@ class _RadialAnimationState extends State<RadialAnimation> {
                       icon: SchoolLogo(
                           radius: 36.0,
                           school: School.fromSchoolModel(widget.schools[i]))),
-                GestureDetector(
-                    onTap: _open,
+                TapRegion(
+                    onTapInside: (_) => _open(),
+                    onTapOutside: (_) => _open(true),
                     child: ClipOval(
                       child: Container(
-                        height: 72,
-                        width: 72,
-                        decoration:
-                            const BoxDecoration(color: AppColors.darkGreen),
-                        child: Center(
-                          child: Text(widget.schools.length.toString()),
+                        padding: const EdgeInsets.all(16.0),
+                        height: 80,
+                        width: 80,
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: ClipOval(
+                          child: Container(
+                            width: 72,
+                            height: 72,
+                            decoration:
+                                const BoxDecoration(color: AppColors.darkGreen),
+                            child: Center(
+                              child: Text(
+                                widget.schools.length.toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     )),
@@ -393,19 +410,21 @@ class _RadialAnimationState extends State<RadialAnimation> {
         });
   }
 
-  var _wasOpened = false;
+  var _wasOpened = true;
 
-  void _open() {
-    if (!_wasOpened) {
+  void _open([bool? value]) {
+    final val = value ?? !_wasOpened;
+    if (!val) {
       widget.controller.forward();
     } else {
       widget.controller.reverse();
     }
-    _wasOpened = !_wasOpened;
+
+    _wasOpened = val;
     widget.toggle();
   }
 
-  _buildButton(double angle,
+  Widget _buildButton(double angle,
       {Color? color, Widget? icon, void Function()? onTap}) {
     final double rad = radians(angle);
     return Transform(
@@ -415,7 +434,7 @@ class _RadialAnimationState extends State<RadialAnimation> {
         child: GestureDetector(
             onTap: () {
               if (onTap != null) onTap();
-              _open();
+              _open(!_wasOpened);
             },
             child: icon));
   }

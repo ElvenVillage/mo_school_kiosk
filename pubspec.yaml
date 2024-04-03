@@ -25,10 +25,12 @@ dependencies:
   intl: ^0.18.1
   json_annotation: ^4.8.1
   latlong2: ^0.8.1
+  logger: ^2.2.0
   map_controller_plus:
     git:
       ref: e3618b2
       url: https://github.com/ElvenVillage/map_controller_plus.git
+  path_provider: ^2.1.2
   provider: ^6.1.1
   retrofit: ^4.0.3
   rxdart: ^0.27.7

@@ -343,8 +343,8 @@ class _AppState extends State<App> {
             ),
             Builder(builder: (context) {
               final provider = context.watch<StatsProvider>();
-// TODO
-              if (provider.stats.isEmpty && false) {
+
+              if (provider.stats.isEmpty) {
                 return Container(
                   color: Colors.grey.withAlpha(100),
                   width: double.maxFinite,

@@ -8,6 +8,7 @@ import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/report.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/api/stats.dart';
+import 'package:mo_school_kiosk/utils.dart';
 
 enum Indicator {
   // cредний балл в учебном заведении
@@ -96,51 +97,75 @@ class StatsProvider extends ChangeNotifier {
     if (_loading) return;
     _loading = true;
 
-    try {
-      final data = await client.getStats();
+    while (true) {
+      try {
+        LmsLogger().log.i('loading consolidated.statistic');
+        final data = await client.getStats();
 
-      final dataBySchools = data.answer.data.groupListsBy((e) => School(
-          id: e.orgId,
-          name: e.orgName.replaceAll('\n', ' '),
-          dbName: e.dbName ?? ''));
+        final dataBySchools = data.answer.data.groupListsBy((e) => School(
+            id: e.orgId,
+            name: e.orgName.replaceAll('\n', ' '),
+            dbName: e.dbName ?? ''));
 
-      for (final indicator in Indicator.values) {
-        stats[indicator] = getData(dataBySchools, indicator);
+        LmsLogger().log.i('loaded data for ${dataBySchools.length} schools');
+
+        for (final indicator in Indicator.values) {
+          stats[indicator] = getData(dataBySchools, indicator);
+        }
+
+        schools
+          ..clear()
+          ..addAll(dataBySchools.keys);
+
+        error = '';
+
+        break;
+      } on DioException catch (e) {
+        error = e.error?.toString() ?? 'Не удалось загрузить данные';
+        LmsLogger()
+            .log
+            .e('Could not fetch consolidated_statistic, retrying...', error: e);
+        await Future.delayed(const Duration(seconds: 5));
+      } catch (e) {
+        error = e.toString();
+        LmsLogger()
+            .log
+            .e('Could not fetch consolidated_statistic, retrying...', error: e);
+        await Future.delayed(const Duration(seconds: 5));
+      } finally {
+        _loading = false;
+        notifyListeners();
       }
-
-      schools
-        ..clear()
-        ..addAll(dataBySchools.keys);
-
-      error = '';
-      notifyListeners();
-      await loadReports();
-      _loading = false;
-    } on DioException catch (e) {
-      error = e.error?.toString() ?? 'Не удалось загрузить данные';
-      notifyListeners();
-      load();
-    } catch (e) {
-      error = e.toString();
-      notifyListeners();
-      load();
     }
+
+    await loadReports();
   }
 
   Future<void> loadReports() async {
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
     for (final school in schools) {
-      try {
-        final response = await client.getReport(school.id, date);
-        reports[school] = response.answer.data;
+      while (true) {
+        try {
+          LmsLogger().log.i('loading GeneralStatisticOne for ${school.dbName}');
+          final response = await client.getReport(school.id, date);
+          reports[school] = response.answer.data;
 
-        notifyListeners();
-      } on DioException catch (e) {
-        error = e.error?.toString() ?? 'Не удалось загрузить данные';
-        notifyListeners();
-        load();
-      } catch (e) {
-        error = e.toString();
+          break;
+        } on DioException catch (e) {
+          error = e.error?.toString() ?? 'Не удалось загрузить данные';
+          LmsLogger().log.e(
+              'Could not fetch GeneralStatisticOne for ${school.dbName}, retrying...',
+              error: e);
+          await Future.delayed(const Duration(seconds: 5));
+        } catch (e) {
+          LmsLogger().log.e(
+              'Could not fetch GeneralStatisticOne for ${school.dbName}, retrying...',
+              error: e);
+          error = e.toString();
+          await Future.delayed(const Duration(seconds: 5));
+        } finally {
+          notifyListeners();
+        }
       }
     }
     notifyListeners();

@@ -28,10 +28,11 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (displayVersion)
             const Expanded(
               child: Padding(
-                padding: EdgeInsets.only(left: 12.0, bottom: 20.0),
+                padding: EdgeInsets.only(left: 12.0),
                 child: Text(
-                  'v$kPackageVersion',
-                  style: TextStyle(fontSize: 16.0),
+                  'v$kPackageVersion\n$kBuildDate',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 16.0, color: AppColors.darkGreen),
                 ),
               ),
             )
