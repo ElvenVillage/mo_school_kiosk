@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:collection/collection.dart';
+import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/content/school_details_page.dart';
+import 'package:mo_school_kiosk/event_channel.dart';
 import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/widgets/school_logo.dart';
 // ignore: depend_on_referenced_packages
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 // ignore: depend_on_referenced_packages
 import 'package:vector_math/vector_math.dart' show radians;
-import 'package:flutter_map/flutter_map.dart';
+// import 'package:flutter_map/flutter_map.dart';
 import 'package:map_controller_plus/map_controller_plus.dart';
 import 'package:mo_school_kiosk/content/model.dart';
 import 'package:mo_school_kiosk/utils.dart';
@@ -34,6 +37,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
   late final StatefulMapController statefulMapController;
   late final StreamSubscription<StatefulMapControllerStateChange> sub;
   late final StreamSubscription<MapEvent> zoomSub;
+  late final StreamSubscription multitouchSub;
 
   late final Proj4Crs epsg3576crs;
 
@@ -41,7 +45,31 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
       proj4.Projection.add('EPSG:3576',
           '+proj=laea +lat_0=90 +lon_0=90 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 
-  bool namedMarkers = false;
+  bool _namedMarkers = false;
+  final _zoomLevelStream = BehaviorSubject<bool>();
+  static const zoomThreshold = 6;
+
+  var _zoom = 1;
+
+  void _handleZoom(double zoomValue) {
+    final zoom = zoomValue.toInt();
+    if (_zoom == zoom) return;
+    _zoom = zoom;
+
+    if (zoom >= zoomThreshold && !_namedMarkers) {
+      _namedMarkers = true;
+
+      _zoomLevelStream.sink.add(false);
+    }
+
+    if (zoom < zoomThreshold && _namedMarkers) {
+      _namedMarkers = false;
+
+      _zoomLevelStream.sink.add(true);
+    }
+
+    _updateMarkers();
+  }
 
   Future<void> initMap() async {
     epsg3576crs = Proj4Crs.fromFactory(
@@ -67,19 +95,11 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
     mapController = MapController();
 
     zoomSub = mapController.mapEventStream.listen((event) {
-      if (event.zoom > 4 && !namedMarkers) {
-        setState(() {
-          namedMarkers = true;
-        });
+      if (event is MapEventMove) {
+        _handleZoom(event.targetZoom);
+        return;
       }
-
-      if (event.zoom < 4 && namedMarkers) {
-        setState(() {
-          namedMarkers = false;
-        });
-      }
-
-      _updateMarkers();
+      _handleZoom(event.zoom);
     });
     statefulMapController = StatefulMapController(mapController: mapController);
 
@@ -100,8 +120,6 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
     mapController.move(LatLng(70, 90), 2.5);
   }
 
-  var _toggled = false;
-
   void _updateMarkers() {
     final schoolsByCities =
         (widget.data.schools ?? <SchoolModel>[]).groupListsBy((e) => e.city);
@@ -120,91 +138,104 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
         final school = schools.first;
 
         statefulMapController.addMarker(
-            marker: Marker(
-                key: Key(school.id),
-                width: namedMarkers ? 512 : 64,
-                height: namedMarkers ? 90 : 64,
-                point: point,
-                builder: (_) {
-                  final model = School.fromSchoolModel(school);
-                  if (namedMarkers) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(SchoolDetailsPage.route(model));
-                      },
-                      child: Container(
-                        width: 512,
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(32.0)),
-                        child: Row(
-                          children: [
-                            SchoolLogo(
-                              school: model,
-                              radius: 36.0,
-                            ),
-                            Expanded(
-                              child: Text(
-                                model.name,
-                                style: const TextStyle(
-                                  color: AppColors.darkGreen,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context)
-                          .push(SchoolDetailsPage.route(model));
-                    },
-                    child: SchoolLogo(
-                      school: model,
-                    ),
-                  );
-                }),
-            name: school.name);
+            marker: _singularMarker(school, point), name: school.name);
 
         continue;
       }
 
       statefulMapController.addMarker(
-          marker: Marker(
-              key: Key(city.key),
-              width: 250,
-              height: 250,
-              point: point,
-              builder: (_) => RadialMenu(
-                    schools: city.value,
-                    onToggle: () {
-                      if (!_toggled) {
-                        statefulMapController.removeMarkers(
-                            names: entries
-                                .where((e) => e.key != city.key)
-                                .map((e) => e.key)
-                                .toList());
-                      } else {
-                        _updateMarkers();
-                      }
-                      _toggled = !_toggled;
-                    },
-                  )),
-          name: city.key);
+          marker: _groupMarker(city, point), name: city.key);
     }
+  }
+
+  Marker _groupMarker(MapEntry<String, List<SchoolModel>> city, LatLng point) {
+    return Marker(
+        key: Key(city.key),
+        width: 250,
+        height: 250,
+        point: point,
+        builder: (_) => RadialMenu(
+              schools: city.value,
+              zoomLevelStream: _zoomLevelStream,
+            ));
+  }
+
+  Marker _singularMarker(SchoolModel school, LatLng point) {
+    return Marker(
+        key: Key(school.id),
+        width: _namedMarkers ? 512 : 64,
+        height: _namedMarkers ? 90 : 64,
+        point: point,
+        builder: (_) {
+          final model = School.fromSchoolModel(school);
+          if (_namedMarkers) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(SchoolDetailsPage.route(model));
+              },
+              child: Container(
+                width: 512,
+                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(32.0)),
+                child: Row(
+                  children: [
+                    SchoolLogo(
+                      school: model,
+                      radius: 36.0,
+                    ),
+                    Expanded(
+                      child: Text(
+                        model.name,
+                        style: const TextStyle(
+                          color: AppColors.darkGreen,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(SchoolDetailsPage.route(model));
+            },
+            child: SchoolLogo(
+              school: model,
+            ),
+          );
+        });
   }
 
   @override
   void initState() {
     super.initState();
     initMap();
+    _initMultitouch();
+  }
+
+  final _mapKey = GlobalKey<FlutterMapState>();
+
+  void _initMultitouch() {
+    multitouchSub =
+        GtkMultitouchEventChannel.streamFromNative().listen((event) {
+      // print('${event.runtimeType} $event');
+      final scale = double.tryParse(event['scale'].toString()) ?? 1.0;
+      // final x = double.tryParse(event['scale'].toString()) ?? 1.0;
+      // final y = double.tryParse(event['scale'].toString()) ?? 1.0;
+
+      if (scale == 1.0) return;
+
+      final nZoom = (mapController.zoom * scale - mapController.zoom);
+
+      mapController.move(
+          mapController.center, mapController.zoom + nZoom * 0.5);
+    });
   }
 
   @override
@@ -214,8 +245,13 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
         body: Stack(
           children: [
             FlutterMap(
+              key: _mapKey,
               options: MapOptions(
                   crs: epsg3576crs,
+                  boundsOptions: const FitBoundsOptions(
+                    forceIntegerZoomLevel: true,
+                    inside: true,
+                  ),
                   keepAlive: true,
                   zoom: 2.0,
                   interactiveFlags:
@@ -243,14 +279,18 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
                     children: [
                       IconButton(
                           onPressed: () {
-                            mapController.move(
-                                mapController.center, mapController.zoom + 1);
+                            final nZoom = (_zoom + 1).toDouble();
+                            final move =
+                                mapController.move(mapController.center, nZoom);
+                            if (move) _handleZoom(nZoom);
                           },
                           icon: const Icon(Icons.add)),
                       IconButton(
                           onPressed: () {
-                            mapController.move(
-                                mapController.center, mapController.zoom - 1);
+                            final nZoom = (_zoom - 1).toDouble();
+                            final move =
+                                mapController.move(mapController.center, nZoom);
+                            if (move) _handleZoom(nZoom);
                           },
                           icon: const Icon(Icons.minimize))
                     ],
@@ -266,6 +306,8 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
   void dispose() {
     sub.cancel();
     zoomSub.cancel();
+    _zoomLevelStream.close();
+    multitouchSub.cancel();
     mapController.dispose();
     super.dispose();
   }
@@ -274,10 +316,13 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
 // https://github.com/fireship-io/170-flutter-animated-radial-menu
 
 class RadialMenu extends StatefulWidget {
-  const RadialMenu({super.key, required this.schools, required this.onToggle});
+  const RadialMenu(
+      {super.key, required this.schools, required this.zoomLevelStream});
 
   final List<SchoolModel> schools;
-  final void Function() onToggle;
+
+  // раскрытие при приближении
+  final BehaviorSubject<bool> zoomLevelStream;
 
   @override
   createState() => _RadialMenuState();
@@ -290,6 +335,7 @@ class _RadialMenuState extends State<RadialMenu>
   @override
   void initState() {
     super.initState();
+
     controller = AnimationController(
         duration: const Duration(milliseconds: 400), vsync: this);
   }
@@ -297,9 +343,10 @@ class _RadialMenuState extends State<RadialMenu>
   @override
   Widget build(BuildContext context) {
     return RadialAnimation(
-        controller: controller,
-        schools: widget.schools,
-        toggle: widget.onToggle);
+      controller: controller,
+      schools: widget.schools,
+      zoomLevelStream: widget.zoomLevelStream,
+    );
   }
 
   @override
@@ -310,12 +357,12 @@ class _RadialMenuState extends State<RadialMenu>
 }
 
 class RadialAnimation extends StatefulWidget {
-  RadialAnimation(
-      {Key? key,
-      required this.controller,
-      required this.schools,
-      required this.toggle})
-      : translation = Tween<double>(
+  RadialAnimation({
+    Key? key,
+    required this.controller,
+    required this.zoomLevelStream,
+    required this.schools,
+  })  : translation = Tween<double>(
           begin: 0.0,
           end: 100.0,
         ).animate(
@@ -335,13 +382,39 @@ class RadialAnimation extends StatefulWidget {
 
   final List<SchoolModel> schools;
 
-  final void Function() toggle;
+  final BehaviorSubject<bool> zoomLevelStream;
 
   @override
   State<RadialAnimation> createState() => _RadialAnimationState();
 }
 
 class _RadialAnimationState extends State<RadialAnimation> {
+  late final StreamSubscription<bool> _zoomSub;
+  var _namedMarkers = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.zoomLevelStream.valueOrNull ?? false) {
+      final val = widget.zoomLevelStream.value;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _open(val);
+      });
+    }
+    _zoomSub = widget.zoomLevelStream.listen((event) {
+      setState(() {
+        _open(event);
+        _namedMarkers = !event;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _zoomSub.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -376,7 +449,7 @@ class _RadialAnimationState extends State<RadialAnimation> {
                           school: School.fromSchoolModel(widget.schools[i]))),
                 TapRegion(
                     onTapInside: (_) => _open(),
-                    onTapOutside: (_) => _open(true),
+                    onTapOutside: _namedMarkers ? null : (_) => _open(true),
                     child: ClipOval(
                       child: Container(
                         padding: const EdgeInsets.all(16.0),
@@ -416,7 +489,6 @@ class _RadialAnimationState extends State<RadialAnimation> {
     }
 
     _wasOpened = val;
-    widget.toggle();
   }
 
   Widget _buildButton(double angle, {Widget? icon, void Function()? onTap}) {

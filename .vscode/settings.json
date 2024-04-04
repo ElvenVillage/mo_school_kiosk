@@ -2,4 +2,5 @@
     "files.exclude": {
       "**/*.g.dart": true
     },
+    "cmake.sourceDirectory": "/Users/denisvolkov/Documents/projects/mo_stats_kiosk/mo_school_kiosk/linux",
   }

@@ -14,6 +14,23 @@ struct _MyApplication {
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
+
+static FlBinaryMessenger *binaryMessenger;
+static FlEventChannel *globalEvents;
+
+static void zoom_scale_changed(GtkGesture *gesture, gdouble scale, gpointer data) {
+  // printf("ZOOM CHANGED FROM C");
+  GdkEventSequence *sequence = gtk_gesture_get_last_updated_sequence(gesture);
+  const GdkEvent *event = gtk_gesture_get_last_event(gesture, sequence);
+  g_autoptr(FlValue) map = fl_value_new_map();
+  fl_value_set_string(map, "event", fl_value_new_string("zoom changed"));
+  fl_value_set_string(map, "scale", fl_value_new_float(scale));
+  fl_value_set_string(map, "x", fl_value_new_float(event->button.x));
+  fl_value_set_string(map, "y", fl_value_new_float(event->button.y));
+  fl_event_channel_send(globalEvents, map, nullptr, nullptr);
+}
+
+
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
@@ -47,9 +64,19 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "LMS KIOSK");
   }
 
+  gtk_widget_add_events (GTK_WIDGET(window), GDK_TOUCH_MASK | GDK_TOUCHPAD_GESTURE_MASK);
+
+  GtkGesture *zoom = gtk_gesture_zoom_new(GTK_WIDGET(window));
+  g_signal_connect (G_OBJECT (zoom), "scale-changed", G_CALLBACK (zoom_scale_changed), NULL);
+  gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER (zoom), GTK_PHASE_CAPTURE);
+  // g_object_weak_ref (G_OBJECT (window), (GWeakNotify) g_object_unref, zoom);
+
+
+
   gtk_window_set_default_size(window, 960, 540);
   gtk_window_fullscreen(window);
   gtk_widget_show(GTK_WIDGET(window));
+  
 
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
@@ -60,6 +87,12 @@ static void my_application_activate(GApplication* application) {
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+
+  binaryMessenger = fl_engine_get_binary_messenger(fl_view_get_engine(view));
+  g_autoptr(FlStandardMethodCodec) globalEventCodec = fl_standard_method_codec_new();
+  globalEvents = fl_event_channel_new(binaryMessenger,
+                                        "ru.nintegra/kiosk.dovuz/events",
+                                        FL_METHOD_CODEC(globalEventCodec));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
@@ -87,6 +120,7 @@ static gboolean my_application_local_command_line(GApplication* application, gch
 static void my_application_dispose(GObject* object) {
   MyApplication* self = MY_APPLICATION(object);
   g_clear_pointer(&self->dart_entrypoint_arguments, g_strfreev);
+  g_clear_object(&globalEvents);
   G_OBJECT_CLASS(my_application_parent_class)->dispose(object);
 }
 

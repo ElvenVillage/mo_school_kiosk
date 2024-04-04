@@ -76,6 +76,14 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
     return result;
   }
 
+  String _formatValue(num? value, {String? add, int? digits}) {
+    if (value == null) return 'Нет данных';
+    if (digits != null) {
+      return '${value.toStringAsFixed(digits).replaceAll(".", ",")}${add ?? ""}';
+    }
+    return '${value.toString().replaceAll(".", ",")}${add ?? ""}';
+  }
+
   Widget _schoolData(BuildContext context, PhonebookResponse? schoolData,
       ({int fact, int plan}) countData) {
     final data = schoolData?.answer.data.schools.first;
@@ -101,18 +109,16 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
     final values = [
       data.info.phone,
       data.info.phone,
-      '${countData.fact} человек',
-      '${countData.plan} человек',
-      '${countData.plan - countData.fact} человек',
-      stats[Indicator.komplekt]![widget.school] == null
-          ? 'Нет данных'
-          : '${stats[Indicator.komplekt]![widget.school]}%',
-      '${(stats[Indicator.averageGrade]![widget.school]?.toStringAsFixed(2))?.replaceAll('.', ',')}',
-      '${stats[Indicator.intensity]![widget.school]}%',
-      '${stats[Indicator.plan]![widget.school]}%',
-      '${stats[Indicator.commentsGrades]![widget.school]}%',
-      '${stats[Indicator.elMaterials]![widget.school]}%',
-      '${stats[Indicator.events]![widget.school]}',
+      countData.fact.studentsPlural,
+      countData.plan.studentsPlural,
+      (countData.plan - countData.fact).studentsPlural,
+      _formatValue(stats[Indicator.komplekt]![widget.school], add: '%'),
+      _formatValue(stats[Indicator.averageGrade]![widget.school], digits: 2),
+      _formatValue(stats[Indicator.intensity]![widget.school], add: '%'),
+      _formatValue(stats[Indicator.plan]![widget.school], add: '%'),
+      _formatValue(stats[Indicator.commentsGrades]![widget.school], add: '%'),
+      _formatValue(stats[Indicator.elMaterials]![widget.school], add: '%'),
+      _formatValue(stats[Indicator.events]![widget.school]),
     ];
 
     final style = Theme.of(context).textTheme.titleLarge;
@@ -194,14 +200,13 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
       'Заместитель НУ (по воспитательной работе)'
     ].map((e) => e.toLowerCase());
 
-    final List<PhonebookContact?> administration = data.phones
-        .where((e) => administrationEntries.contains(e.bookEntry.toLowerCase()))
-        .toList();
+    final adminContacts = data.phones.where(
+        (e) => administrationEntries.contains(e.bookEntry.toLowerCase()));
 
-    if (administration.length < 4) {
-      administration.addAll(List.filled(
-          administrationEntries.length - administration.length, null));
-    }
+    final administration = [
+      ...adminContacts,
+      for (var i = 0; i < 4 - adminContacts.length; i++) null
+    ];
 
     return Row(
       children: [

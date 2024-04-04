@@ -11,6 +11,11 @@ int numCompare(MapEntry<School, num?> a, MapEntry<School, num?> b) {
   return ((b.value ?? 0.0) - (a.value ?? 0.0)).sign.toInt();
 }
 
+extension StudentsPlural on int {
+  String get studentsPlural =>
+      '${toString()} ${Intl.plural(this, zero: 'человек', one: 'человек', few: 'человека', other: 'человек')}';
+}
+
 Route createRoute(Widget Function(BuildContext context) builder) {
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 300),
@@ -120,14 +125,7 @@ class LmsLogger {
   factory LmsLogger() => _instance ??= LmsLogger._internal();
 
   final log = Logger(
-    printer: PrettyPrinter(
-      methodCount: 1,
-      errorMethodCount: 6,
-      lineLength: 120,
-      colors: false,
-      printEmojis: false,
-      printTime: true,
-    ),
+    printer: SimplePrinter(),
     output: _LogFileOutput(),
   );
 }
@@ -139,7 +137,8 @@ class _LogFileOutput extends LogOutput {
 
   @override
   void output(OutputEvent event) async {
-    final Directory directory = await AppSettings.getAppDirectory();
+    final directory = await AppSettings.getAppDirectory();
+    if (directory == null) return null;
     file ??= File('${directory.path}/log.txt');
 
     for (var line in event.lines) {

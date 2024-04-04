@@ -1,12 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 class AppSettings {
   static String? consolidatedLogin;
   static String? consolidatedPassword;
   static String? baseLogin;
   static String? basePassword;
 
-  static Future<Directory> getAppDirectory() async {
+  static Future<Directory?> getAppDirectory() async {
+    if (kIsWeb) return null;
+
     String home;
     if (Platform.isWindows) {
       home = Platform.environment['USERPROFILE']!;
@@ -28,6 +32,14 @@ class AppSettings {
 
   static Future<void> load() async {
     final directory = await getAppDirectory();
+    if (directory == null) {
+      final val = toJson();
+      consolidatedLogin = val['consolidatedLogin'];
+      consolidatedPassword = val['consolidatedPassword'];
+      baseLogin = val['baseLogin'];
+      basePassword = val['basePassword'];
+      return;
+    }
     final settingsFile = File('${directory.path}/settings.ini');
 
     final wasInitialized = await settingsFile.exists();
