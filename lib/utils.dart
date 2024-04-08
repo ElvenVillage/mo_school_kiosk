@@ -125,6 +125,7 @@ class LmsLogger {
   factory LmsLogger() => _instance ??= LmsLogger._internal();
 
   final log = Logger(
+    filter: ProductionFilter(),
     printer: SimplePrinter(),
     output: _LogFileOutput(),
   );
@@ -139,7 +140,12 @@ class _LogFileOutput extends LogOutput {
   void output(OutputEvent event) async {
     final directory = await AppSettings.getAppDirectory();
     if (directory == null) return null;
-    file ??= File('${directory.path}/log.txt');
+    file ??= File('${directory.path}log.txt');
+
+    final exists = await file!.exists();
+    if (!exists) {
+      await file!.create(recursive: true);
+    }
 
     for (var line in event.lines) {
       await file?.writeAsString("${line.toString()}\n",
