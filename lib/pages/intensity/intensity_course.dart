@@ -86,27 +86,30 @@ class IntensityCourse extends StatelessWidget {
                                                 Border.all(color: Colors.white),
                                             color: AppColors.darkGreen,
                                             borderRadius:
-                                                BorderRadius.circular(28.0)),
-                                        padding: const EdgeInsets.all(8.0),
+                                                BorderRadius.circular(32.0)),
+                                        padding: const EdgeInsets.all(10.0),
                                         margin: const EdgeInsets.fromLTRB(
                                             8.0, 8.0, 20.0, 8.0),
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: RichText(
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              text: TextSpan(
-                                                  text: subject.key.$2 == '-1'
-                                                      ? ''
-                                                      : '${subject.value}% ',
-                                                  children: [
-                                                    TextSpan(
-                                                        text: subject.key.$1,
-                                                        style: context
-                                                            .headlineMedium)
-                                                  ],
-                                                  style:
-                                                      context.headlineLarge)),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                                subject.key.$2 == '-1'
+                                                    ? ''
+                                                    : '${subject.value}% ',
+                                                style: context.headlineLarge),
+                                            Flexible(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: Text(subject.key.$1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                    style:
+                                                        context.headlineMedium),
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
                                     )

@@ -31,7 +31,7 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
     return Stack(
       children: [
         PageTemplate(
-            title: widget.school.name,
+            title: widget.school.name.toUpperCase(),
             body: SizedBox(
                 width: double.maxFinite,
                 child: FutureBuilder(
@@ -195,8 +195,8 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
   Widget _administrationGrid(PhonebookDataEntry data) {
     final administrationEntries = [
       'Начальник училища',
-      'Заместитель НУ (по учебной работе)',
       'Заместитель НУ (по ИОТ)',
+      'Заместитель НУ (по учебной работе)',
       'Заместитель НУ (по воспитательной работе)'
     ].map((e) => e.toLowerCase());
 
@@ -286,9 +286,26 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 32.0),
-              child: Text(
-                '${e.bookEntry}\n${e.fio.split(' ').join('\n')}\n${e.workPhone.isEmpty ? e.mobilePhone : e.workPhone}',
-                style: Theme.of(context).textTheme.titleMedium,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    e.bookEntry,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      e.fio.split(' ').join('\n'),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Text(
+                    e.workPhone.isEmpty ? e.mobilePhone : e.workPhone,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
               ),
             ),
           ),

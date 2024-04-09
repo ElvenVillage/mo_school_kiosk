@@ -234,7 +234,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
       final nZoom = (mapController.zoom * scale - mapController.zoom);
 
       mapController.move(
-          mapController.center, mapController.zoom + nZoom * 0.5);
+          mapController.center, mapController.zoom + nZoom * 0.2);
     });
   }
 
