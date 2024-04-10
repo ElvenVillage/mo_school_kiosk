@@ -510,8 +510,12 @@ class _LessonDetailsCard extends StatelessWidget {
                         final homework = snapshot.data?.homework;
 
                         return ListTile(
-                          subtitle: Text('ДЗ: $homework', style: context.body),
-                          title: Text('Тема:$topic\n', style: context.body),
+                          subtitle: (homework?.isNotEmpty ?? false)
+                              ? Text('ДЗ: $homework', style: context.body)
+                              : null,
+                          title: (topic?.isNotEmpty ?? false)
+                              ? Text('Тема: $topic\n', style: context.body)
+                              : null,
                         );
                       },
                     ),

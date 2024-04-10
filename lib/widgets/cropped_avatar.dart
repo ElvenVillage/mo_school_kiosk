@@ -32,14 +32,20 @@ class CroppedAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: compute<String, Uint8List>(_cropImage, photoUrl),
+        future: compute(_cropImage, photoUrl),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasData) {
+            return Image.memory(
+              snapshot.data!,
+            );
           }
-          return Image.memory(
-            snapshot.data!,
-          );
+          if (snapshot.hasError) {
+            return const CircleAvatar(
+              radius: 64.0,
+              backgroundImage: AssetImage('assets/profile.png'),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
         });
   }
 }
