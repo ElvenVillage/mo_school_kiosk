@@ -30,6 +30,8 @@ class StudentsCount extends StatelessWidget {
         .sorted(numCompare)
         .take(3);
 
+    final width = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -40,6 +42,7 @@ class StudentsCount extends StatelessWidget {
               'ЧИСЛЕННОСТЬ',
               style: context.headlineLarge.copyWith(
                 color: AppColors.secondary,
+                fontSize: width / 1980 * 36.0,
                 decoration: TextDecoration.underline,
                 decorationColor: AppColors.secondary,
               ),
@@ -170,13 +173,15 @@ class _MaxAdmission extends StatelessWidget {
     final (maxM, maxF) = (mStats?.first, fStats?.first);
     final maximum = (maxM?.value ?? 0) > (maxF?.value ?? 0) ? maxM : maxF;
 
+    final width = MediaQuery.of(context).size.width;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'МАКСИМАЛЬНЫЙ КОНКУРС',
           style: context.body.copyWith(
-              fontSize: 18.0,
+              fontSize: width / 1980 * 18.0,
               color: AppColors.secondary,
               fontWeight: FontWeight.bold),
           maxLines: 1,

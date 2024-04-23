@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/komplekt_base_card.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
@@ -77,12 +78,14 @@ class TopFivePage extends StatelessWidget {
     final data = context.watch<StatsProvider>().stats[indicator] ?? {};
     final sorted = data.entries.sorted(numCompare);
 
+    final useMobileLayout = context.useMobileLayout;
+
     return PageTemplate(
         title: caption,
         body: SizedBox(
           width: double.maxFinite,
           child: GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: useMobileLayout ? 1 : 2,
               shrinkWrap: true,
               crossAxisSpacing: 50,
               childAspectRatio: 5,
@@ -90,15 +93,15 @@ class TopFivePage extends StatelessWidget {
                   sorted.where((db) => db.value != null).mapIndexed((idx, db) {
                 return Row(
                   children: [
-                    if (idx.isEven) const Spacer(),
+                    if (idx.isEven || useMobileLayout) const Spacer(),
                     Expanded(
-                      flex: 4,
+                      flex: useMobileLayout ? 8 : 4,
                       child: KomplektCard(
                           db: db.key,
                           komplekt:
                               KomplektModel(null, null, null, db.value!, add)),
                     ),
-                    if (idx.isOdd) const Spacer(),
+                    if (idx.isOdd || useMobileLayout) const Spacer(),
                   ],
                 );
               }).toList()),

@@ -27,24 +27,25 @@ class SelectStudentPage extends StatelessWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: BaseCard(db: school),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      group.name,
-                      style: context.headlineLarge,
+            if (!context.useMobileLayout)
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: BaseCard(db: school),
                     ),
                   ),
-                )
-              ],
-            ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        group.name,
+                        style: context.headlineLarge,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             Expanded(
               child: ReloadableFutureBuilder<StudentsListResponse>(
                 builder: (data) {

@@ -168,12 +168,27 @@ class _NewsCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(item.formattedDate),
-                                ),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Источник: ${Uri.parse(item.link!).host}',
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      item.formattedDate,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
                               )
                             ],
                           ))),
@@ -267,6 +282,17 @@ class NewsDetailsScreen extends StatelessWidget {
                           textStyle: context.headlineMedium,
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, top: 16.0, bottom: 16.0),
+                        child: Text(
+                          'Источник: ${Uri.parse(item.link!).host}',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 17.0),
+                        ),
+                      )
                     ]),
               );
             }));

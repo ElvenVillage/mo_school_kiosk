@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/komplekt_base_card.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
@@ -23,19 +24,21 @@ class KomplektPage extends StatelessWidget {
     final val = data.stats[Indicator.komplekt]!;
     final valSorted = val.entries.sorted(numCompare);
 
+    final useMobileLayout = context.useMobileLayout;
+
     return PageTemplate(
         title: 'УКОМПЛЕКТОВАННОСТЬ ПЕДРАБОТНИКАМИ',
         body: GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: useMobileLayout ? 1 : 2,
             shrinkWrap: true,
             crossAxisSpacing: 50,
-            childAspectRatio: 5,
+            childAspectRatio: 4,
             children: valSorted.mapIndexed((idx, db) {
               return Row(
                 children: [
-                  if (idx.isEven) const Spacer(),
+                  if (idx.isEven || useMobileLayout) const Spacer(),
                   Expanded(
-                    flex: 4,
+                    flex: useMobileLayout ? 8 : 4,
                     child: KomplektCard(
                       komplekt: KomplektModel(
                           totalTeachers[db.key],
@@ -46,7 +49,7 @@ class KomplektPage extends StatelessWidget {
                       db: db.key,
                     ),
                   ),
-                  if (idx.isOdd) const Spacer(),
+                  if (idx.isOdd || useMobileLayout) const Spacer(),
                 ],
               );
             }).toList()));

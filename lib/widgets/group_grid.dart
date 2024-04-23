@@ -49,19 +49,21 @@ class GroupGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = groups.groupListsBy((e) => e.kurs);
-    return Column(
-      children: rows.values
-          .map((row) => Row(
-                children: row
-                    .map((group) => _GroupButton(
-                          key: UniqueKey(),
-                          school: school,
-                          group: group,
-                          onTap: onTap,
-                        ))
-                    .toList(),
-              ))
-          .toList(),
+    return SingleChildScrollView(
+      child: Column(
+        children: rows.values
+            .map((row) => Row(
+                  children: row
+                      .map((group) => _GroupButton(
+                            key: UniqueKey(),
+                            school: school,
+                            group: group,
+                            onTap: onTap,
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+      ),
     );
   }
 }

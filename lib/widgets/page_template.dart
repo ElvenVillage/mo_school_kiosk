@@ -23,7 +23,7 @@ class PageTemplate extends StatelessWidget {
       children: [
         Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: LmsAppBar(title: title),
+          appBar: context.useMobileLayout ? null : LmsAppBar(title: title),
           body: Container(
             decoration: const BoxDecoration(
                 image: DecorationImage(

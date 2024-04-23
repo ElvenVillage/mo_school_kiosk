@@ -9,6 +9,8 @@ class TopFiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         Container(
@@ -19,9 +21,9 @@ class TopFiveCard extends StatelessWidget {
                   child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14.0,
+                        fontSize: width / 1980 * 14.0,
                         fontWeight: FontWeight.bold)),
               )),
               Padding(
@@ -58,8 +60,8 @@ class TopFiveCard extends StatelessWidget {
                         entry.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 18.0),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: width / 1980 * 18.0),
                       ),
                     ))
               ],

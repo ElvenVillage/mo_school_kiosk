@@ -3,6 +3,7 @@ import 'package:mo_school_kiosk/api/api.dart';
 import 'package:mo_school_kiosk/api/groups.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
 import 'package:mo_school_kiosk/pages/kadets/select_student.dart';
+import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/base_card.dart';
 import 'package:mo_school_kiosk/widgets/group_grid.dart';
@@ -21,10 +22,11 @@ class SelectGroupPage extends StatelessWidget {
         title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ',
         subtitle: 'Выберите класс',
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Hero(tag: school.dbName, child: BaseCard(db: school)),
-          ),
+          if (!context.useMobileLayout)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Hero(tag: school.dbName, child: BaseCard(db: school)),
+            ),
           Expanded(
             child: ReloadableFutureBuilder<GroupsResponse>(
               builder: (data) {

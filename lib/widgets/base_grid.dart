@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/api/schools.dart';
+import 'package:mo_school_kiosk/style.dart';
 
 import 'base_card.dart';
 
@@ -12,17 +13,19 @@ class BaseGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = context.useMobileLayout;
+
     return GridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: useMobileLayout ? 1 : 2,
         shrinkWrap: true,
         crossAxisSpacing: 50,
-        childAspectRatio: 5,
+        childAspectRatio: 4,
         children: schools.mapIndexed((idx, db) {
           return Row(
             children: [
-              if (idx.isEven) const Spacer(),
+              if (idx.isEven || useMobileLayout) const Spacer(),
               Expanded(
-                flex: 4,
+                flex: useMobileLayout ? 8 : 4,
                 child: Hero(
                   tag: db.dbName,
                   child: BaseCard(
@@ -31,7 +34,7 @@ class BaseGrid extends StatelessWidget {
                   ),
                 ),
               ),
-              if (idx.isOdd) const Spacer(),
+              if (idx.isOdd || useMobileLayout) const Spacer(),
             ],
           );
         }).toList());

@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mo_school_kiosk/pages/intensity/intensity_course.dart';
 import 'package:mo_school_kiosk/providers/data_provider.dart';
+import 'package:mo_school_kiosk/style.dart';
 import 'package:mo_school_kiosk/utils.dart';
 import 'package:mo_school_kiosk/widgets/komplekt_base_card.dart';
 import 'package:mo_school_kiosk/widgets/page_template.dart';
@@ -17,19 +18,21 @@ class IntensitySchool extends StatelessWidget {
     final data = context.watch<StatsProvider>().stats[Indicator.intensity]!;
     final valSorted = data.entries.sorted(numCompare);
 
+    final bool useMobileLayout = context.useMobileLayout;
+
     return PageTemplate(
         title: 'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
         body: GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: useMobileLayout ? 1 : 2,
             shrinkWrap: true,
             crossAxisSpacing: 50,
-            childAspectRatio: 5,
+            childAspectRatio: 4,
             children: valSorted.mapIndexed((idx, db) {
               return Row(
                 children: [
-                  if (idx.isEven) const Spacer(),
+                  if (idx.isEven || useMobileLayout) const Spacer(),
                   Expanded(
-                    flex: 4,
+                    flex: useMobileLayout ? 8 : 4,
                     child: KomplektCard(
                       onTap: () {
                         Navigator.of(context)
@@ -40,7 +43,7 @@ class IntensitySchool extends StatelessWidget {
                       db: db.key,
                     ),
                   ),
-                  if (idx.isOdd) const Spacer(),
+                  if (idx.isOdd || useMobileLayout) const Spacer(),
                 ],
               );
             }).toList()));

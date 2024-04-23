@@ -13,11 +13,13 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final collapseTitle = title.length > 50;
 
+    final width = MediaQuery.of(context).size.width;
+
     final titleWidget = Text(title,
         maxLines: collapseTitle ? 2 : 1,
         textAlign: TextAlign.center,
         style: TextStyle(
-            fontSize: collapseTitle ? 32.0 : 48.0,
+            fontSize: width / 1980 * (collapseTitle ? 32.0 : 48.0),
             color: AppColors.primary,
             fontWeight: FontWeight.bold));
 

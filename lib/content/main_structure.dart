@@ -69,6 +69,7 @@ class _MainStructureState extends State<MainStructure> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: CustomPaint(
@@ -85,6 +86,7 @@ class _MainStructureState extends State<MainStructure> {
                       'СТРУКТУРА',
                       style: context.headlineLarge.copyWith(
                         color: AppColors.secondary,
+                        fontSize: width / 1980 * 36.0,
                         decoration: TextDecoration.underline,
                         decorationColor: AppColors.secondary,
                       ),
@@ -106,6 +108,8 @@ class _StructureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Expanded(
       child: InkWell(
         onTap: (model.schools?.isNotEmpty ?? false)
@@ -133,8 +137,9 @@ class _StructureCard extends StatelessWidget {
                               padding:
                                   const EdgeInsets.only(left: 8.0, top: 4.0),
                               child: Text(model.name,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Colors.white)),
+                                  style: TextStyle(
+                                      fontSize: width / 1980 * 16.0,
+                                      color: Colors.white)),
                             ),
                           )
                         ],

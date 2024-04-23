@@ -138,6 +138,11 @@ class _LogFileOutput extends LogOutput {
 
   @override
   void output(OutputEvent event) async {
+    if (Platform.isIOS) {
+      debugPrint(event.lines.join('\n'));
+      return;
+    }
+
     final directory = await AppSettings.getAppDirectory();
     if (directory == null) return null;
     file ??= File('${directory.path}log.txt');

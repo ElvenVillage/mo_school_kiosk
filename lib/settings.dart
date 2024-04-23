@@ -12,6 +12,11 @@ class AppSettings {
     if (kIsWeb) return null;
 
     String home;
+
+    if (Platform.isIOS) {
+      return null;
+    }
+
     if (Platform.isWindows) {
       home = Platform.environment['USERPROFILE']!;
     } else {

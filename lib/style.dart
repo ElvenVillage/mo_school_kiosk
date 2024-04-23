@@ -6,11 +6,32 @@ class AppColors {
   static const darkGreen = Color(0xFF112129);
 }
 
+extension MobileLayout on BuildContext {
+  bool get useMobileLayout => MediaQuery.of(this).size.shortestSide < 600;
+}
+
 extension TextStyles on BuildContext {
-  TextStyle get headlineMedium =>
-      Theme.of(this).textTheme.headlineSmall!.copyWith(color: Colors.white);
-  TextStyle get headlineLarge =>
-      Theme.of(this).textTheme.headlineLarge!.copyWith(color: Colors.white);
-  TextStyle get body =>
-      Theme.of(this).textTheme.bodyLarge!.copyWith(color: Colors.white);
+  TextStyle get headlineMedium {
+    final width = MediaQuery.of(this).size.width;
+
+    final theme = Theme.of(this).textTheme.headlineSmall!;
+    return theme.copyWith(
+        color: Colors.white, fontSize: width / 1980 * theme.fontSize!);
+  }
+
+  TextStyle get headlineLarge {
+    final width = MediaQuery.of(this).size.width;
+
+    final theme = Theme.of(this).textTheme.headlineLarge!;
+    return theme.copyWith(
+        color: Colors.white, fontSize: width / 1980 * theme.fontSize!);
+  }
+
+  TextStyle get body {
+    final width = MediaQuery.of(this).size.width;
+
+    final theme = Theme.of(this).textTheme.bodyLarge!;
+    return theme.copyWith(
+        color: Colors.white, fontSize: width / 1980 * theme.fontSize!);
+  }
 }

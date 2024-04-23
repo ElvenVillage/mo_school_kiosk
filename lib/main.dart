@@ -26,6 +26,15 @@ import 'package:window_manager/window_manager.dart';
 import 'content/main_structure.dart';
 import 'content/students_count.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 class CustomScrollBehavior extends ScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
@@ -44,6 +53,7 @@ class CustomScrollBehavior extends ScrollBehavior {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru_RU');
+  HttpOverrides.global = MyHttpOverrides();
 
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.ensureInitialized();
@@ -108,10 +118,12 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: EdgeInsets.all(width / 1980 * 32.0),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -129,7 +141,7 @@ class _SectionCard extends StatelessWidget {
                             child: Text(title ?? '',
                                 maxLines: null,
                                 style: context.headlineLarge.copyWith(
-                                    fontSize: 24.0,
+                                    fontSize: width / 1980 * 20.0,
                                     fontWeight: FontWeight.bold))),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -141,7 +153,7 @@ class _SectionCard extends StatelessWidget {
                                       .toStringAsFixed(1)
                                       .replaceAll('.', ','),
                               style: context.headlineLarge.copyWith(
-                                fontSize: 85.0,
+                                fontSize: width / 1980 * 85.0,
                               )),
                         )
                       ],
@@ -213,6 +225,8 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return ChangeNotifierProvider(
       lazy: false,
       create: (context) => StatsProvider()
@@ -240,9 +254,11 @@ class _AppState extends State<App> {
               themeMode: ThemeMode.dark,
               debugShowCheckedModeBanner: false,
               home: Scaffold(
-                appBar: const LmsAppBar(
-                    displayVersion: true,
-                    title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
+                appBar: context.useMobileLayout
+                    ? null
+                    : const LmsAppBar(
+                        displayVersion: true,
+                        title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
                 body: Builder(builder: (context) {
                   return Container(
                     decoration: const BoxDecoration(
@@ -283,7 +299,7 @@ class _AppState extends State<App> {
                                 flex: 8,
                                 child: InfiniteCarousel.builder(
                                   controller: _carouselController,
-                                  itemExtent: 1980 / 9 * 4 - 24,
+                                  itemExtent: width / 9 * 4,
                                   center: false,
                                   itemCount: 6,
                                   itemBuilder: (context, itemIndex, realIndex) {
@@ -402,8 +418,10 @@ class _TopThreeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = context.useMobileLayout;
     final data = context.watch<StatsProvider>().stats[indicator] ?? {};
-    final sorted = data.entries.sorted(numCompare).take(3);
+    final sorted =
+        data.entries.sorted(numCompare).take(useMobileLayout ? 1 : 3);
 
     return Column(
       children: [
@@ -470,88 +488,95 @@ class MainStats extends StatelessWidget {
     final avgIntensity = intensities.isNotEmpty ? intensities.average : 0.0;
     final avgKomplekt = komplekts.isNotEmpty ? komplekts.average : 0.0;
 
+    final width = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: _SectionCard(
-                'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
-                avgIntensity.toStringAsFixed(1),
-                'intensity.png',
-                const _TopThreeList(
-                  indicator: Indicator.intensity,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(IntensitySchool.route());
-                },
-                details: true,
-              ),
-            ),
-            Flexible(
-              child: _SectionCard(
-                'УКОМПЛЕКТОВАННОСТЬ ПЕДРАБОТНИКАМИ',
-                avgKomplekt.toString(),
-                'komplekt.png',
-                const _TopThreeList(
-                  indicator: Indicator.komplekt,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(KomplektPage.route());
-                },
-                details: true,
-              ),
-            )
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: _SectionCard(
-                null,
-                null,
-                'personal.png',
-                _wrap(
-                  Text('ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ',
-                      style: context.headlineLarge.copyWith(fontSize: 36.0)),
-                ),
-                onTap: () {
-                  Navigator.of(context).push(SelectBasePage.route());
-                },
-              ),
-            ),
-            Flexible(
-              child: _SectionCard(
-                null,
-                null,
-                'schedule.png',
-                _wrap(
-                  Text(
-                    'РАСПИСАНИЕ ЗАНЯТИЙ',
-                    style: context.headlineLarge,
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: _SectionCard(
+                  'СРЕДНЯЯ ИНТЕНСИВНОСТЬ ОЦЕНИВАНИЯ ЗНАНИЙ',
+                  avgIntensity.toStringAsFixed(1),
+                  'intensity.png',
+                  const _TopThreeList(
+                    indicator: Indicator.intensity,
                   ),
+                  onTap: () {
+                    Navigator.of(context).push(IntensitySchool.route());
+                  },
+                  details: true,
                 ),
-                onTap: () {
-                  Navigator.of(context).push(SchedulePage.route());
-                },
               ),
-            ),
-            Flexible(
-              child: _SectionCard(
-                null,
-                null,
-                'newsfeed.png',
-                _wrap(
-                  Text('НОВОСТИ\n', style: context.headlineLarge),
+              Flexible(
+                child: _SectionCard(
+                  'УКОМПЛЕКТОВАННОСТЬ ПЕДРАБОТНИКАМИ',
+                  avgKomplekt.toString(),
+                  'komplekt.png',
+                  const _TopThreeList(
+                    indicator: Indicator.komplekt,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(KomplektPage.route());
+                  },
+                  details: true,
                 ),
-                onTap: () {
-                  Navigator.of(context).push(NewsScreen.route());
-                },
+              )
+            ],
+          ),
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: _SectionCard(
+                  null,
+                  null,
+                  'personal.png',
+                  _wrap(
+                    Text('ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ',
+                        style: context.headlineLarge
+                            .copyWith(fontSize: width / 1980 * 36.0)),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(SelectBasePage.route());
+                  },
+                ),
               ),
-            )
-          ],
+              Flexible(
+                child: _SectionCard(
+                  null,
+                  null,
+                  'schedule.png',
+                  _wrap(
+                    Text(
+                      'РАСПИСАНИЕ ЗАНЯТИЙ',
+                      style: context.headlineLarge,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(SchedulePage.route());
+                  },
+                ),
+              ),
+              Flexible(
+                child: _SectionCard(
+                  null,
+                  null,
+                  'newsfeed.png',
+                  _wrap(
+                    Text('НОВОСТИ\n', style: context.headlineLarge),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(NewsScreen.route());
+                  },
+                ),
+              )
+            ],
+          ),
         )
       ],
     );
