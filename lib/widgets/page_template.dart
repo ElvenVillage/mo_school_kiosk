@@ -19,11 +19,15 @@ class PageTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lmsAppBar = LmsAppBar(
+      title: title,
+      useMobileLayout: context.useMobileLayout,
+    );
     return Stack(
       children: [
         Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: context.useMobileLayout ? null : LmsAppBar(title: title),
+          appBar: lmsAppBar,
           body: Container(
             decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -42,7 +46,7 @@ class PageTemplate extends StatelessWidget {
             ]),
           ),
         ),
-        if (overlaySubtitle != null)
+        if (overlaySubtitle != null && !context.useMobileLayout)
           Positioned(
             top: kToolbarHeight * 0.5,
             child: overlaySubtitle!,

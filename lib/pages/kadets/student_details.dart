@@ -23,7 +23,10 @@ class StudentDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const LmsAppBar(title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ'),
+      appBar: LmsAppBar(
+        title: 'ЛИЧНЫЕ ДЕЛА ОБУЧАЮЩИХСЯ',
+        useMobileLayout: context.useMobileLayout,
+      ),
       body: Container(
         decoration: const BoxDecoration(
             image: DecorationImage(

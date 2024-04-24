@@ -34,7 +34,9 @@ class TopFiveList extends StatelessWidget {
             : sorted.first.value!;
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: context.useMobileLayout
+          ? const EdgeInsets.all(4.0)
+          : const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(TopFivePage.route(

@@ -42,7 +42,7 @@ class StudentsCount extends StatelessWidget {
               'ЧИСЛЕННОСТЬ',
               style: context.headlineLarge.copyWith(
                 color: AppColors.secondary,
-                fontSize: width / 1980 * 36.0,
+                fontSize: width / 1980 * 32.0,
                 decoration: TextDecoration.underline,
                 decorationColor: AppColors.secondary,
               ),
@@ -51,7 +51,7 @@ class StudentsCount extends StatelessWidget {
           Column(
             children: [
               Text('Всего обучающихся',
-                  style: context.body.copyWith(fontSize: 26.0),
+                  style: context.body.copyWith(fontSize: width / 1980 * 24.0),
                   textAlign: TextAlign.center,
                   maxLines: 1),
               RichText(
@@ -69,7 +69,7 @@ class StudentsCount extends StatelessWidget {
                         children: [
                           Image.asset(
                             'assets/more/boy.png',
-                            height: 85,
+                            height: width / 1980 * 85,
                           ),
                           Text(
                             '$countM\nчел.',
@@ -85,7 +85,7 @@ class StudentsCount extends StatelessWidget {
                       children: [
                         Image.asset(
                           'assets/more/girl.png',
-                          height: 85,
+                          height: width / 1980 * 85,
                         ),
                         Text(
                           '$countF\nчел.',
@@ -102,57 +102,60 @@ class StudentsCount extends StatelessWidget {
           const Divider(color: AppColors.secondary),
           const _MaxAdmission(),
           const Divider(color: AppColors.secondary),
-          Column(children: [
-            Row(
-              children: [
-                Image.asset('assets/icons/medal.png'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 36.0),
-                  child: Text('УДОСТОЕНЫ МЕДАЛИ\n«ЗА ОСОБЫЕ\n УСПЕХИ В УЧЕНИИ»',
-                      textAlign: TextAlign.right,
-                      style: context.body.copyWith(
-                          color: AppColors.secondary, fontSize: 14.0)),
-                )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'ТОП 3',
-                style: context.body.copyWith(color: AppColors.secondary),
-              ),
-            ),
-            Column(
-              children: [
-                for (final medal in medals)
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          medal.key.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(children: [
-                                TextSpan(
-                                  text: '${medal.value}',
-                                  style: context.headlineMedium,
-                                ),
-                                const TextSpan(text: '\nчел')
-                              ])),
-                        ),
-                      )
-                    ],
+          if (!context.useMobileLayout)
+            Column(children: [
+              Row(
+                children: [
+                  Image.asset('assets/icons/medal.png'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 36.0),
+                    child: Text(
+                        'УДОСТОЕНЫ МЕДАЛИ\n«ЗА ОСОБЫЕ\n УСПЕХИ В УЧЕНИИ»',
+                        textAlign: TextAlign.right,
+                        style: context.body.copyWith(
+                            color: AppColors.secondary,
+                            fontSize: width / 1980 * 14.0)),
                   )
-              ],
-            )
-          ])
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'ТОП 3',
+                  style: context.body.copyWith(color: AppColors.secondary),
+                ),
+              ),
+              Column(
+                children: [
+                  for (final medal in medals)
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            medal.key.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(children: [
+                                  TextSpan(
+                                    text: '${medal.value}',
+                                    style: context.headlineMedium,
+                                  ),
+                                  const TextSpan(text: '\nчел')
+                                ])),
+                          ),
+                        )
+                      ],
+                    )
+                ],
+              )
+            ])
         ],
       ),
     );
@@ -207,7 +210,7 @@ class _MaxAdmission extends StatelessWidget {
                 builder: (context, snapshot) => CircleAvatar(
                   backgroundColor: Colors.white,
                   backgroundImage: snapshot.data,
-                  radius: 36.0,
+                  radius: width / 1980 * 36.0,
                 ),
               )
             ],
@@ -223,9 +226,10 @@ class _MaxAdmission extends StatelessWidget {
                   style: context.headlineMedium,
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'человек/место\nдевочки',
+                  style: context.body,
                   textAlign: TextAlign.right,
                 ),
               )
@@ -241,9 +245,10 @@ class _MaxAdmission extends StatelessWidget {
                   style: context.headlineMedium,
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'человек/место\nмальчики',
+                  style: context.body,
                   textAlign: TextAlign.right,
                 ),
               )

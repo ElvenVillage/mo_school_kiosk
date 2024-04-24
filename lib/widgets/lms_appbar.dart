@@ -5,9 +5,13 @@ import '../style.dart';
 
 class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LmsAppBar(
-      {super.key, required this.title, this.displayVersion = false});
+      {super.key,
+      required this.title,
+      this.displayVersion = false,
+      required this.useMobileLayout});
   final String title;
   final bool displayVersion;
+  final bool useMobileLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -64,5 +68,7 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight * 2);
+  Size get preferredSize => useMobileLayout
+      ? const Size.fromHeight(kToolbarHeight)
+      : const Size.fromHeight(kToolbarHeight * 2);
 }

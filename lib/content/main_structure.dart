@@ -86,7 +86,7 @@ class _MainStructureState extends State<MainStructure> {
                       'СТРУКТУРА',
                       style: context.headlineLarge.copyWith(
                         color: AppColors.secondary,
-                        fontSize: width / 1980 * 36.0,
+                        fontSize: width / 1980 * 32.0,
                         decoration: TextDecoration.underline,
                         decorationColor: AppColors.secondary,
                       ),
@@ -128,9 +128,9 @@ class _StructureCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(model.count.toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 24,
+                                  fontSize: width / 1980 * 24.0,
                                   fontWeight: FontWeight.bold)),
                           Flexible(
                             child: Padding(

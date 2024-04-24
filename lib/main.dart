@@ -227,6 +227,10 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
+    final lmsAppBar = LmsAppBar(
+        useMobileLayout: context.useMobileLayout,
+        displayVersion: true,
+        title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ');
     return ChangeNotifierProvider(
       lazy: false,
       create: (context) => StatsProvider()
@@ -254,105 +258,122 @@ class _AppState extends State<App> {
               themeMode: ThemeMode.dark,
               debugShowCheckedModeBanner: false,
               home: Scaffold(
-                appBar: context.useMobileLayout
-                    ? null
-                    : const LmsAppBar(
-                        displayVersion: true,
-                        title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ'),
+                appBar: context.useMobileLayout ? null : lmsAppBar,
                 body: Builder(builder: (context) {
                   return Container(
                     decoration: const BoxDecoration(
                         image: DecorationImage(
                             image: AssetImage('assets/background.png'),
                             fit: BoxFit.cover)),
-                    child: Column(
-                      children: [
-                        const Expanded(
-                          flex: 4,
-                          child: Row(
+                    child: Builder(builder: (context) {
+                      const topPart = Row(
+                        children: [
+                          Expanded(child: MainStructure()),
+                          Expanded(child: StudentsCount()),
+                          Expanded(
+                            flex: 4,
+                            child: MainStats(),
+                          )
+                        ],
+                      );
+                      final bottomPart = Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Image.asset('assets/top5.png'),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 8,
+                            child: InfiniteCarousel.builder(
+                              controller: _carouselController,
+                              itemExtent: width / 9 * 4,
+                              center: false,
+                              itemCount: 6,
+                              itemBuilder: (context, itemIndex, realIndex) {
+                                final stats = switch (itemIndex) {
+                                  0 => const TopFiveList(
+                                      caption: 'СРЕДНИЙ БАЛЛ',
+                                      indicator: Indicator.averageGrade,
+                                      maxValue: 5.0,
+                                    ),
+                                  1 => const TopFiveList(
+                                      caption:
+                                          'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
+                                      indicator: Indicator.plan,
+                                      maxValue: 100.0,
+                                      add: '% ',
+                                    ),
+                                  2 => const TopFiveList(
+                                      caption:
+                                          'ПРОЦЕНТ КОММЕНТИРОВАНИЯ ВЫСТАВЛЕННЫХ ОЦЕНОК',
+                                      indicator: Indicator.commentsGrades,
+                                      add: '%',
+                                    ),
+                                  3 => const TopFiveList(
+                                      caption:
+                                          'ПРОЦЕНТ ЗАНЯТИЙ С ЭЛЕКТРОННЫМИ МАТЕРИАЛАМИ',
+                                      indicator: Indicator.elMaterials,
+                                      add: '%',
+                                    ),
+                                  4 => const TopFiveList(
+                                      caption:
+                                          'КОЛИЧЕСТВО СТОБАЛЛЬНИКОВ ПО ЕГЭ',
+                                      indicator: Indicator.score100),
+                                  _ => const TopFiveList(
+                                      caption:
+                                          'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
+                                      indicator: Indicator.events,
+                                    )
+                                };
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [Expanded(child: stats), _gap()],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+
+                      if (context.useMobileLayout) {
+                        return SingleChildScrollView(
+                          child: Column(
                             children: [
-                              Expanded(child: MainStructure()),
-                              Expanded(child: StudentsCount()),
-                              Expanded(
-                                flex: 4,
-                                child: MainStats(),
-                              )
+                              SizedBox(
+                                  height: kToolbarHeight, child: lmsAppBar),
+                              SizedBox(
+                                height: MediaQuery.of(context).size.height,
+                                child: topPart,
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.4,
+                                  child: bottomPart)
                             ],
                           ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Divider(
-                            color: AppColors.secondary,
+                        );
+                      }
+
+                      return Column(
+                        children: [
+                          const Expanded(
+                            flex: 4,
+                            child: topPart,
                           ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Image.asset('assets/top5.png'),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 8,
-                                child: InfiniteCarousel.builder(
-                                  controller: _carouselController,
-                                  itemExtent: width / 9 * 4,
-                                  center: false,
-                                  itemCount: 6,
-                                  itemBuilder: (context, itemIndex, realIndex) {
-                                    final stats = switch (itemIndex) {
-                                      0 => const TopFiveList(
-                                          caption: 'СРЕДНИЙ БАЛЛ',
-                                          indicator: Indicator.averageGrade,
-                                          maxValue: 5.0,
-                                        ),
-                                      1 => const TopFiveList(
-                                          caption:
-                                              'ПРОЦЕНТ ЗАПОЛНЕНИЯ ТЕМАТИЧЕСКОГО ПЛАНИРОВАНИЯ',
-                                          indicator: Indicator.plan,
-                                          maxValue: 100.0,
-                                          add: '% ',
-                                        ),
-                                      2 => const TopFiveList(
-                                          caption:
-                                              'ПРОЦЕНТ КОММЕНТИРОВАНИЯ ВЫСТАВЛЕННЫХ ОЦЕНОК',
-                                          indicator: Indicator.commentsGrades,
-                                          add: '%',
-                                        ),
-                                      3 => const TopFiveList(
-                                          caption:
-                                              'ПРОЦЕНТ ЗАНЯТИЙ С ЭЛЕКТРОННЫМИ МАТЕРИАЛАМИ',
-                                          indicator: Indicator.elMaterials,
-                                          add: '%',
-                                        ),
-                                      4 => const TopFiveList(
-                                          caption:
-                                              'КОЛИЧЕСТВО СТОБАЛЛЬНИКОВ ПО ЕГЭ',
-                                          indicator: Indicator.score100),
-                                      _ => const TopFiveList(
-                                          caption:
-                                              'КОЛИЧЕСТВО МЕРОПРИЯТИЙ ЗА ПОСЛЕДНИЕ 7 ДНЕЙ',
-                                          indicator: Indicator.events,
-                                        )
-                                    };
-                                    return Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Expanded(child: stats),
-                                        _gap()
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Divider(
+                              color: AppColors.secondary,
+                            ),
                           ),
-                        )
-                      ],
-                    ),
+                          Expanded(
+                            child: bottomPart,
+                          )
+                        ],
+                      );
+                    }),
                   );
                 }),
               ),

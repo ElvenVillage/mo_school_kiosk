@@ -28,7 +28,8 @@ class TopFiveCard extends StatelessWidget {
               )),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: Image.asset('assets/icons/star.png'),
+                child: Image.asset('assets/icons/star.png',
+                    height: width / 1980 * 48.0),
               )
             ],
           ),
