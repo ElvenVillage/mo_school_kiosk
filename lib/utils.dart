@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -17,6 +18,9 @@ extension StudentsPlural on int {
 }
 
 Route createRoute(Widget Function(BuildContext context) builder) {
+  if (Platform.isIOS) {
+    return CupertinoPageRoute(builder: builder);
+  }
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 300),
     reverseTransitionDuration: const Duration(milliseconds: 300),

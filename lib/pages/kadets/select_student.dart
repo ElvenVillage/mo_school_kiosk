@@ -50,8 +50,14 @@ class SelectStudentPage extends StatelessWidget {
               child: ReloadableFutureBuilder<StudentsListResponse>(
                 builder: (data) {
                   final students = data.answer.data;
+                  final useMobileLayout = context.useMobileLayout;
+
+                  final style = useMobileLayout
+                      ? context.body.copyWith(fontSize: 16.0)
+                      : context.body;
+
                   return GridView.count(
-                    crossAxisCount: 5,
+                    crossAxisCount: useMobileLayout ? 2 : 5,
                     childAspectRatio: 2.2,
                     children: [
                       for (final student in students ?? const [])
@@ -77,7 +83,7 @@ class SelectStudentPage extends StatelessWidget {
                                       24.0, 0.0, 8.0, 36.0),
                                   child: Text(
                                     student.fio,
-                                    style: context.body,
+                                    style: style,
                                   ),
                                 ),
                               ],

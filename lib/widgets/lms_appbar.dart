@@ -42,6 +42,23 @@ class LmsAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             )
+          else if (useMobileLayout)
+            Expanded(
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 50,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.arrow_back_ios),
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+            )
           else
             const Spacer(),
           if (collapseTitle)

@@ -72,14 +72,26 @@ class StudentDetailsAnswer implements LmsAnswer {
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
+class StudentAward {
+  StudentAward();
+  factory StudentAward.fromJson(Map<String, dynamic> json) =>
+      _$StudentAwardFromJson(json);
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
 class StudentDetais {
   final List<StudentInfo> info;
   final List<StudentGrade> grades;
+  final List<StudentAward> awards;
 
   factory StudentDetais.fromJson(Map<String, dynamic> json) =>
       _$StudentDetaisFromJson(json);
 
-  StudentDetais({required this.info, required this.grades});
+  StudentDetais({
+    required this.info,
+    required this.grades,
+    required this.awards,
+  });
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)

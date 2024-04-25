@@ -6,6 +6,9 @@ import 'package:mo_school_kiosk/content/schools_list_page.dart';
 import 'package:mo_school_kiosk/style.dart';
 
 class _StructureBaselinePainter extends CustomPainter {
+  _StructureBaselinePainter(this.direction);
+  Axis direction;
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -30,7 +33,9 @@ class _StructureBaselinePainter extends CustomPainter {
 }
 
 class MainStructure extends StatefulWidget {
-  const MainStructure({super.key});
+  const MainStructure({super.key, required this.direction});
+
+  final Axis direction;
 
   @override
   State<MainStructure> createState() => _MainStructureState();
@@ -73,27 +78,35 @@ class _MainStructureState extends State<MainStructure> {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: CustomPaint(
-        painter: _StructureBaselinePainter(),
+        painter: _StructureBaselinePainter(widget.direction),
         child: FutureBuilder(
             future: _data ??= _loadSchools(context),
             builder: (context, snapshot) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, top: 12.0),
-                    child: Text(
-                      'СТРУКТУРА',
-                      style: context.headlineLarge.copyWith(
-                        color: AppColors.secondary,
-                        fontSize: width / 1980 * 32.0,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.secondary,
-                      ),
+              final children = [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 12.0),
+                  child: Text(
+                    'СТРУКТУРА',
+                    style: context.headlineLarge.copyWith(
+                      color: AppColors.secondary,
+                      fontSize: width / 1980 * 32.0,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.secondary,
                     ),
                   ),
-                  ...snapshot.data?.map((e) => _StructureCard(e)) ?? const []
-                ],
+                ),
+                ...snapshot.data?.map((e) => _StructureCard(e)) ??
+                    <_StructureCard>[]
+              ];
+              if (widget.direction == Axis.vertical) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                );
+              }
+
+              return Row(
+                children: children,
               );
             }),
       ),

@@ -12,7 +12,7 @@ Builder packageVersionFactory(BuilderOptions options) {
     // ignore: avoid_print
     print("timestamp builder");
     final buildDateContents =
-        'const kBuildDate = \'${DateTime.now().toString().substring(5, 10).replaceAll('-', '.')}\';\r\n';
+        'const kBuildDate = "${DateTime.now().toString().substring(5, 10).replaceAll('-', '.')}";\r\n';
 
     final pubspec = File('pubspec.yaml').readAsLinesSync();
     String? versionNumber;
@@ -26,7 +26,7 @@ Builder packageVersionFactory(BuilderOptions options) {
     versionNumber ??= '1.0.0';
 
     final versionNumberContents =
-        'const kPackageVersion = \'$versionNumber\';\r\n';
+        'const kPackageVersion = "$versionNumber";\r\n';
     const partOfContents = 'part of \'consts.dart\';\r\n';
 
     File(_outputFilePath).writeAsStringSync(

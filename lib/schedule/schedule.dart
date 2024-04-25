@@ -66,15 +66,19 @@ class _ScheduleGroupsPageState extends State<ScheduleGroupsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = context.useMobileLayout;
+
     return PageTemplate(
         title: 'РАСПИСАНИЕ ЗАНЯТИЙ',
-        subtitle: 'Выберите класс',
+        subtitle: useMobileLayout ? null : 'Выберите класс',
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Hero(
-                tag: widget.school.dbName, child: BaseCard(db: widget.school)),
-          ),
+          if (!useMobileLayout)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Hero(
+                  tag: widget.school.dbName,
+                  child: BaseCard(db: widget.school)),
+            ),
           Expanded(
             child: StreamBuilder(
               builder: (context, snapshot) {

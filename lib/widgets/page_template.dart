@@ -23,6 +23,7 @@ class PageTemplate extends StatelessWidget {
       title: title,
       useMobileLayout: context.useMobileLayout,
     );
+
     return Stack(
       children: [
         Scaffold(
@@ -36,10 +37,12 @@ class PageTemplate extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if (subtitle != null)
+              if (subtitle != null && !context.useMobileLayout)
                 Expanded(
                     child: Center(
                         child: Text(subtitle!, style: context.headlineLarge)))
+              else if (context.useMobileLayout)
+                const SizedBox.shrink()
               else
                 const SizedBox(height: kToolbarHeight),
               Expanded(flex: 9, child: body),

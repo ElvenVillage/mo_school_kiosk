@@ -24,15 +24,22 @@ class KomplektCard extends StatelessWidget {
   final School db;
   final KomplektModel komplekt;
 
-  Widget _dataRow(String val, String title, BuildContext context) {
+  Widget _dataRow(String val, String title, TextStyle style) {
     return Row(children: [
-      Text(val, style: context.body.copyWith(fontWeight: FontWeight.bold)),
-      Text(' $title', style: context.body),
+      Text(val, style: style),
+      Text(' $title', style: style),
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
+    final style = context.useMobileLayout
+        ? context.body.copyWith(fontSize: 16.0)
+        : context.body;
+
+    final headlineLargeStyle = context.useMobileLayout
+        ? context.headlineLarge.copyWith(fontSize: 20.0)
+        : context.headlineLarge;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,8 +67,7 @@ class KomplektCard extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 40.0),
                             child: Text(
                               db.name,
-                              style: context.body.copyWith(
-                                  decoration: TextDecoration.underline),
+                              style: style,
                             ),
                           ),
                         ),
@@ -77,20 +83,20 @@ class KomplektCard extends StatelessWidget {
                             children: [
                               if (komplekt.total != null)
                                 _dataRow(komplekt.total.toString(),
-                                    'всего педработников', context),
+                                    'всего педработников', style),
                               if (komplekt.first != null)
                                 _dataRow(komplekt.firstNum.toString(),
-                                    'первой категории', context),
+                                    'первой категории', style),
                               if (komplekt.highest != null)
                                 _dataRow(komplekt.highestNum.toString(),
-                                    'высшей категории', context),
+                                    'высшей категории', style),
                             ],
                           ),
                           if (komplekt.total != null) const Spacer(flex: 3),
                           if (komplekt.value > 0.0)
                             Text(
                               '${komplekt.value}${komplekt.add}',
-                              style: context.headlineLarge,
+                              style: headlineLargeStyle,
                             ),
                           const Spacer(),
                         ],

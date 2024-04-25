@@ -102,60 +102,58 @@ class StudentsCount extends StatelessWidget {
           const Divider(color: AppColors.secondary),
           const _MaxAdmission(),
           const Divider(color: AppColors.secondary),
-          if (!context.useMobileLayout)
-            Column(children: [
-              Row(
-                children: [
-                  Image.asset('assets/icons/medal.png'),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 36.0),
-                    child: Text(
-                        'УДОСТОЕНЫ МЕДАЛИ\n«ЗА ОСОБЫЕ\n УСПЕХИ В УЧЕНИИ»',
-                        textAlign: TextAlign.right,
-                        style: context.body.copyWith(
-                            color: AppColors.secondary,
-                            fontSize: width / 1980 * 14.0)),
-                  )
-                ],
+          Column(children: [
+            Row(
+              children: [
+                Expanded(child: Image.asset('assets/icons/medal.png')),
+                Expanded(
+                  flex: 4,
+                  child: Text('УДОСТОЕНЫ МЕДАЛИ\n«ЗА ОСОБЫЕ\n УСПЕХИ В УЧЕНИИ»',
+                      textAlign: TextAlign.right,
+                      style: context.body.copyWith(
+                          color: AppColors.secondary,
+                          fontSize: width / 1980 * 14.0)),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'ТОП 3',
+                style: context.body.copyWith(color: AppColors.secondary),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'ТОП 3',
-                  style: context.body.copyWith(color: AppColors.secondary),
-                ),
-              ),
-              Column(
-                children: [
-                  for (final medal in medals)
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            medal.key.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+            ),
+            Column(
+              children: [
+                for (final medal in medals)
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          medal.key.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Expanded(
-                          child: Center(
-                            child: RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(children: [
-                                  TextSpan(
-                                    text: '${medal.value}',
-                                    style: context.headlineMedium,
-                                  ),
-                                  const TextSpan(text: '\nчел')
-                                ])),
-                          ),
-                        )
-                      ],
-                    )
-                ],
-              )
-            ])
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(children: [
+                                TextSpan(
+                                  text: '${medal.value}',
+                                  style: context.headlineMedium,
+                                ),
+                                const TextSpan(text: '\nчел')
+                              ])),
+                        ),
+                      )
+                    ],
+                  )
+              ],
+            )
+          ])
         ],
       ),
     );

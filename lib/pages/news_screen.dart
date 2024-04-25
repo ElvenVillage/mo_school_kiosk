@@ -97,6 +97,8 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = context.useMobileLayout;
+
     return PageTemplate(
         title: 'НОВОСТИ',
         body: StreamBuilder(
@@ -105,7 +107,7 @@ class _NewsScreenState extends State<NewsScreen> {
             if (snapshot.data?.isNotEmpty ?? false) {
               final data = snapshot.data!;
               return GridView.count(
-                crossAxisCount: 3,
+                crossAxisCount: useMobileLayout ? 2 : 3,
                 childAspectRatio: 2,
                 crossAxisSpacing: 50,
                 mainAxisSpacing: 50,
@@ -132,6 +134,10 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bodyStyle = context.useMobileLayout
+        ? context.body.copyWith(fontSize: 12)
+        : context.body;
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(NewsDetailsScreen.route(item));
@@ -164,7 +170,7 @@ class _NewsCard extends StatelessWidget {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     item.title ?? '',
-                                    style: context.body,
+                                    style: bodyStyle,
                                   ),
                                 ),
                               ),
