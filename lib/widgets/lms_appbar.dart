@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mo_school_kiosk/consts.dart';
+import 'package:mo_school_kiosk/consts/consts.dart';
 
 import '../style.dart';
 

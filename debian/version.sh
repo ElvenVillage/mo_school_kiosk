@@ -6,7 +6,7 @@ prefix="const kPackageVersion ="
 datePrefix="const kBuildDate = "
 buildDate=$(date +'%m.%d %H:%M')
 version="${prefix} \"${versionNumber}\";${datePrefix} \"${buildDate}\";"
-echo $version | tee lib/consts.dart
+# echo $version | tee lib/consts.dart
 echo $versionNumber | tee debian/version
 
 debVersion="  Version: ${versionNumber}"

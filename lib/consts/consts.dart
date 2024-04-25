@@ -1,0 +1,1 @@
+part 'consts.g.dart';
