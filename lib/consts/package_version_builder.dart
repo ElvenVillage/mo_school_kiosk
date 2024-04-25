@@ -25,7 +25,8 @@ Builder packageVersionFactory(BuilderOptions options) {
 
     versionNumber ??= '1.0.0';
 
-    final versionNumberContents = 'const kPackageVersion = $versionNumber;\r\n';
+    final versionNumberContents =
+        'const kPackageVersion = \'$versionNumber\';\r\n';
     const partOfContents = 'part of \'consts.dart\';\r\n';
 
     File(_outputFilePath).writeAsStringSync(
