@@ -40,75 +40,80 @@ class KomplektCard extends StatelessWidget {
     final headlineLargeStyle = context.useMobileLayout
         ? context.headlineLarge.copyWith(fontSize: 20.0)
         : context.headlineLarge;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-                color: AppColors.darkGreen,
-                border: Border.all(color: Colors.white),
-                borderRadius: BorderRadius.circular(64.0)),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SchoolLogo(school: db),
-                ),
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 40.0),
-                            child: Text(
-                              db.name,
-                              style: style,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: AppColors.darkGreen,
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(64.0)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SchoolLogo(
+                        school: db,
+                        radius: context.useMobileLayout ? 48.0 : 64.0),
+                  ),
+                  Expanded(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (komplekt.total != null)
-                                _dataRow(komplekt.total.toString(),
-                                    'всего педработников', style),
-                              if (komplekt.first != null)
-                                _dataRow(komplekt.firstNum.toString(),
-                                    'первой категории', style),
-                              if (komplekt.highest != null)
-                                _dataRow(komplekt.highestNum.toString(),
-                                    'высшей категории', style),
-                            ],
-                          ),
-                          if (komplekt.total != null) const Spacer(flex: 3),
-                          if (komplekt.value > 0.0)
-                            Text(
-                              '${komplekt.value}${komplekt.add}',
-                              style: headlineLargeStyle,
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 40.0),
+                              child: Text(
+                                db.name,
+                                style: style,
+                              ),
                             ),
-                          const Spacer(),
+                          ),
                         ],
                       ),
-                    )
-                  ],
-                )),
-              ],
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (komplekt.total != null)
+                                  _dataRow(komplekt.total.toString(),
+                                      'всего педработников', style),
+                                if (komplekt.first != null)
+                                  _dataRow(komplekt.firstNum.toString(),
+                                      'первой категории', style),
+                                if (komplekt.highest != null)
+                                  _dataRow(komplekt.highestNum.toString(),
+                                      'высшей категории', style),
+                              ],
+                            ),
+                            if (komplekt.total != null) const Spacer(flex: 3),
+                            if (komplekt.value > 0.0)
+                              Text(
+                                '${komplekt.value}${komplekt.add}',
+                                style: headlineLargeStyle,
+                              ),
+                            const Spacer(),
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -11,9 +11,10 @@ class MainPageCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+
     return InfiniteCarousel.builder(
       controller: controller,
-      itemExtent: width / 9 * 4,
+      itemExtent: context.useMobileLayout ? width * 0.92 : width / 9 * 4,
       center: false,
       itemCount: 6,
       itemBuilder: (context, itemIndex, realIndex) {
@@ -49,7 +50,10 @@ class MainPageCarousel extends StatelessWidget {
         };
         return Row(
           mainAxisSize: MainAxisSize.min,
-          children: [Expanded(child: stats), _gap()],
+          children: [
+            Expanded(child: stats),
+            if (!context.useMobileLayout) _gap()
+          ],
         );
       },
     );

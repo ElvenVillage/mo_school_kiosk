@@ -57,8 +57,8 @@ class SelectStudentPage extends StatelessWidget {
                       : context.body;
 
                   return GridView.count(
-                    crossAxisCount: useMobileLayout ? 2 : 5,
-                    childAspectRatio: 2.2,
+                    crossAxisCount: useMobileLayout ? 3 : 5,
+                    childAspectRatio: useMobileLayout ? 2.0 : 2.2,
                     children: [
                       for (final student in students ?? const [])
                         GestureDetector(
@@ -69,18 +69,22 @@ class SelectStudentPage extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
-                                    height: 128,
-                                    width: 128,
+                                    height: useMobileLayout ? 70 : 128,
+                                    width: useMobileLayout ? 70 : 128,
                                     child: CroppedAvatar(
                                         photoUrl: student.photoUrl(
                                             AppSettings.consolidatedLogin!,
                                             AppSettings
                                                 .consolidatedPassword!))),
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      24.0, 0.0, 8.0, 36.0),
+                                  padding: context.useMobileLayout
+                                      ? const EdgeInsets.only(left: 24.0)
+                                      : const EdgeInsets.fromLTRB(
+                                          24.0, 0.0, 8.0, 36.0),
                                   child: Text(
                                     student.fio,
                                     style: style,

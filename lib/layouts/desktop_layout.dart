@@ -17,7 +17,7 @@ class DesktopLayout extends StatelessWidget {
             child: MainStructure(
           direction: Axis.vertical,
         )),
-        Expanded(child: StudentsCount()),
+        Expanded(child: StudentsCountPage()),
         Expanded(
           flex: 4,
           child: MainStats(),

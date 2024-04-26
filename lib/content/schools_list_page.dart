@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -37,7 +38,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
   late final StatefulMapController statefulMapController;
   late final StreamSubscription<StatefulMapControllerStateChange> sub;
   late final StreamSubscription<MapEvent> zoomSub;
-  late final StreamSubscription multitouchSub;
+  StreamSubscription? multitouchSub;
 
   late final Proj4Crs epsg3576crs;
 
@@ -222,6 +223,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
   final _mapKey = GlobalKey<FlutterMapState>();
 
   void _initMultitouch() {
+    if (!Platform.isLinux) return;
     multitouchSub =
         GtkMultitouchEventChannel.streamFromNative().listen((event) {
       // print('${event.runtimeType} $event');
@@ -307,7 +309,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
     sub.cancel();
     zoomSub.cancel();
     _zoomLevelStream.close();
-    multitouchSub.cancel();
+    multitouchSub?.cancel();
     mapController.dispose();
     super.dispose();
   }

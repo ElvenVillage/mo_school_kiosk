@@ -11,10 +11,8 @@ class TopThreeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final useMobileLayout = context.useMobileLayout;
     final data = context.watch<StatsProvider>().stats[indicator] ?? {};
-    final sorted =
-        data.entries.sorted(numCompare).take(useMobileLayout ? 1 : 3);
+    final sorted = data.entries.sorted(numCompare).take(3);
 
     return Column(
       children: [

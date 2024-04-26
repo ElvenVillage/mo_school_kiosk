@@ -51,14 +51,15 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
                         child: CircularProgressIndicator(),
                       );
                     }))),
-        Positioned(
-          top: 32,
-          left: 36,
-          child: SchoolLogo(
-            school: widget.school,
-            radius: 90.0,
-          ),
-        )
+        if (!context.useMobileLayout)
+          Positioned(
+            top: 32,
+            left: 36,
+            child: SchoolLogo(
+              school: widget.school,
+              radius: 90.0,
+            ),
+          )
       ],
     );
   }
@@ -122,29 +123,52 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
     ];
 
     final style = Theme.of(context).textTheme.titleLarge;
+    final addressWidget = Text(
+      data.info.address.replaceAll('\n', ''),
+      style: style,
+    );
+
+    final size = MediaQuery.of(context).size;
+    final schoolDataWidget = Expanded(
+      flex: 2,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              _dataColumn(captions.take(6).toList(), style,
+                  values.take(6).toList(), true),
+              _dataColumn(captions.sublist(6), style, values.sublist(6), true)
+            ],
+          ),
+        ],
+      ),
+    );
+
+    if (context.useMobileLayout) {
+      return SingleChildScrollView(
+        physics: const PageScrollPhysics(),
+        child: Column(
+          children: [
+            SizedBox(
+              height: size.height - kToolbarHeight,
+              child: Column(
+                children: [addressWidget, Expanded(child: schoolDataWidget)],
+              ),
+            ),
+            SizedBox(
+              height: size.height - kToolbarHeight,
+              child: _administrationGrid(data),
+            )
+          ],
+        ),
+      );
+    }
 
     return Column(
       children: [
-        Text(
-          data.info.address.replaceAll('\n', ''),
-          style: style,
-        ),
-        Expanded(
-          flex: 2,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  _dataColumn(captions.take(6).toList(), style,
-                      values.take(6).toList(), true),
-                  _dataColumn(
-                      captions.sublist(6), style, values.sublist(6), true)
-                ],
-              ),
-            ],
-          ),
-        ),
+        addressWidget,
+        schoolDataWidget,
         Expanded(
           flex: 2,
           child: _administrationGrid(data),
@@ -224,46 +248,47 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
                   .map((e) => Expanded(child: _administrationEntry(e)))
                   .toList()),
         ),
-        Expanded(
-            child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _RoundButton(
-                caption: 'НОВОСТИ',
-                size: 95,
-                onTap: () {
-                  Navigator.of(context).push(NewsScreen.route(widget.school));
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _RoundButton(
-                    caption: 'РАСПИСАНИЕ',
-                    size: 120,
-                    onTap: () {
-                      Navigator.of(context)
-                          .push(ScheduleGroupsPage.route(widget.school));
-                    },
-                  ),
-                  const SizedBox(width: 15),
-                  _RoundButton(
-                    caption: 'ЛИЧНЫЕ ДЕЛА',
-                    size: 85,
-                    onTap: () {
-                      Navigator.of(context)
-                          .push(SelectGroupPage.route(widget.school));
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
-        ))
+        if (!context.useMobileLayout)
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                _RoundButton(
+                  caption: 'НОВОСТИ',
+                  size: 95,
+                  onTap: () {
+                    Navigator.of(context).push(NewsScreen.route(widget.school));
+                  },
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _RoundButton(
+                      caption: 'РАСПИСАНИЕ',
+                      size: 120,
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(ScheduleGroupsPage.route(widget.school));
+                      },
+                    ),
+                    const SizedBox(width: 15),
+                    _RoundButton(
+                      caption: 'ЛИЧНЫЕ ДЕЛА',
+                      size: 85,
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(SelectGroupPage.route(widget.school));
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ))
       ],
     );
   }

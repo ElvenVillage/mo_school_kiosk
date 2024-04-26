@@ -218,9 +218,15 @@ class _ScheduleListState extends State<ScheduleList> {
 
                               return ListView(
                                 children: [
-                                  Text(
-                                    _selectedDay?.scheduleDate ?? '',
-                                    style: context.headlineMedium,
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      _selectedDay?.scheduleDate ?? '',
+                                      style: context.useMobileLayout
+                                          ? context.headlineMedium
+                                              .copyWith(fontSize: 20.0)
+                                          : context.headlineMedium,
+                                    ),
                                   ),
                                   for (final period in allPeriods)
                                     ConstrainedBox(
@@ -318,6 +324,10 @@ class _LessonCard extends StatelessWidget {
 
       if (lesson.isEmpty) return const SizedBox.shrink();
 
+      final body = context.useMobileLayout
+          ? context.body.copyWith(fontSize: 16.0)
+          : context.body;
+
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: InkWell(
@@ -339,7 +349,7 @@ class _LessonCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    flex: 5,
+                    flex: context.useMobileLayout ? 2 : 5,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -348,12 +358,12 @@ class _LessonCard extends StatelessWidget {
                         children: [
                           Text(
                             lesson.map((e) => e.title).join('/'),
-                            style: context.body,
+                            style: body,
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(teachers.map((e) => e.fio).join(' / '),
-                                style: context.body),
+                                style: body),
                           )
                         ],
                       ),
@@ -369,7 +379,7 @@ class _LessonCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             period,
-                            style: context.body,
+                            style: body,
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -377,7 +387,7 @@ class _LessonCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             periodData.periodFormatted,
-                            style: context.body,
+                            style: body,
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -392,7 +402,7 @@ class _LessonCard extends StatelessWidget {
                                   padding: const EdgeInsets.only(left: 16.0),
                                   child: Text(
                                     rooms.map((e) => e.shortName).join(' / '),
-                                    style: context.body,
+                                    style: body,
                                   ),
                                 ),
                               ),
@@ -426,22 +436,24 @@ class _LessonCard extends StatelessWidget {
           return Dialog(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: lesson.map((e) {
-                  final teacher = teachers
-                      .firstWhereOrNull((teacher) => teacher.id == e.teacher);
-                  final room =
-                      rooms.firstWhereOrNull((room) => room.id == e.room);
-                  return _LessonDetailsCard(
-                    teacher: teacher,
-                    selectedDay: selectedDay,
-                    room: room,
-                    provider: provider,
-                    periodData: periodData,
-                    lesson: e,
-                  );
-                }).toList()),
+            child: SingleChildScrollView(
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: lesson.map((e) {
+                    final teacher = teachers
+                        .firstWhereOrNull((teacher) => teacher.id == e.teacher);
+                    final room =
+                        rooms.firstWhereOrNull((room) => room.id == e.room);
+                    return _LessonDetailsCard(
+                      teacher: teacher,
+                      selectedDay: selectedDay,
+                      room: room,
+                      provider: provider,
+                      periodData: periodData,
+                      lesson: e,
+                    );
+                  }).toList()),
+            ),
           );
         });
   }
@@ -466,6 +478,12 @@ class _LessonDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = context.useMobileLayout;
+    final headlineMedium = useMobileLayout
+        ? context.headlineMedium.copyWith(fontSize: 20.0)
+        : context.headlineMedium;
+    final body =
+        useMobileLayout ? context.body.copyWith(fontSize: 16.0) : context.body;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 900),
       child: Card(
@@ -488,13 +506,13 @@ class _LessonDetailsCard extends StatelessWidget {
                     ListTile(
                       title: Text(
                         '\n${lesson.title}',
-                        style: context.headlineMedium,
+                        style: headlineMedium,
                       ),
                     ),
                     ListTile(
                       title: Text(
                         '${teacher?.fio}',
-                        style: context.body,
+                        style: body,
                       ),
                     ),
                     FutureBuilder(
@@ -515,10 +533,10 @@ class _LessonDetailsCard extends StatelessWidget {
 
                         return ListTile(
                           subtitle: (homework?.isNotEmpty ?? false)
-                              ? Text('ДЗ: $homework', style: context.body)
+                              ? Text('ДЗ: $homework', style: body)
                               : null,
                           title: (topic?.isNotEmpty ?? false)
-                              ? Text('Тема: $topic\n', style: context.body)
+                              ? Text('Тема: $topic\n', style: body)
                               : null,
                         );
                       },
@@ -533,7 +551,7 @@ class _LessonDetailsCard extends StatelessWidget {
                     ListTile(
                       title: Text(
                         '${periodData.periodFormatted}\n${periodData.name}\nкаб. ${room?.shortName}',
-                        style: context.body,
+                        style: body,
                       ),
                     ),
                   ],

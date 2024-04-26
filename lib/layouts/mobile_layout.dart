@@ -18,15 +18,39 @@ class MobileLayoutMainPage extends StatelessWidget {
         title: 'ДОВУЗОВСКОЕ ВОЕННОЕ ОБРАЗОВАНИЕ В ЦИФРАХ');
     final size = MediaQuery.of(context).size;
     return SingleChildScrollView(
+      physics: const PageScrollPhysics(),
       child: Column(
         children: [
           SizedBox(height: kToolbarHeight, child: lmsAppBar),
-          const MainStructure(direction: Axis.horizontal),
-          SizedBox(height: size.height, child: const StudentsCount()),
+          SizedBox(
+              height: size.height - kToolbarHeight,
+              child: const MainStructure(direction: Axis.horizontal)),
+          SizedBox(height: size.height, child: const StudentsCountPage()),
           SizedBox(height: size.height, child: const MainStats()),
           SizedBox(
-              height: size.height * 0.5,
-              child: MainPageCarousel(controller: carouselController))
+              height: size.height,
+              child: Column(
+                children: [
+                  Expanded(
+                      child: Row(
+                    children: [
+                      const SizedBox(
+                        width: 35,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Image.asset('assets/top5.png'),
+                      ),
+                    ],
+                  )),
+                  Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: MainPageCarousel(controller: carouselController),
+                      )),
+                ],
+              ))
         ],
       ),
     );

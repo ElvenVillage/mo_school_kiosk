@@ -32,7 +32,7 @@ class KomplektPage extends StatelessWidget {
             crossAxisCount: useMobileLayout ? 1 : 2,
             shrinkWrap: true,
             crossAxisSpacing: 50,
-            childAspectRatio: 4,
+            childAspectRatio: useMobileLayout ? 5 : 4,
             children: valSorted.mapIndexed((idx, db) {
               return Row(
                 children: [

@@ -138,70 +138,73 @@ class _NewsCard extends StatelessWidget {
         ? context.body.copyWith(fontSize: 12)
         : context.body;
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(NewsDetailsScreen.route(item));
-      },
-      child: FutureBuilder(
-          future: NewsDetailsScreen.parseNewspage(item),
-          builder: (context, snapshot) {
-            return Container(
-              decoration: BoxDecoration(
-                  image: snapshot.data?.isNotEmpty ?? false
-                      ? DecorationImage(
-                          image: NetworkImage(snapshot.data!.first),
-                          fit: BoxFit.cover)
-                      : item.enclosure?.url != null
-                          ? DecorationImage(
-                              image: NetworkImage(item.enclosure!.url!),
-                              fit: BoxFit.cover)
-                          : null),
-              child: Column(
-                children: [
-                  const Spacer(),
-                  Expanded(
-                      child: Container(
-                          color: AppColors.secondary.withAlpha(200),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    item.title ?? '',
-                                    style: bodyStyle,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(NewsDetailsScreen.route(item));
+        },
+        child: FutureBuilder(
+            future: NewsDetailsScreen.parseNewspage(item),
+            builder: (context, snapshot) {
+              return Container(
+                decoration: BoxDecoration(
+                    image: snapshot.data?.isNotEmpty ?? false
+                        ? DecorationImage(
+                            image: NetworkImage(snapshot.data!.first),
+                            fit: BoxFit.cover)
+                        : item.enclosure?.url != null
+                            ? DecorationImage(
+                                image: NetworkImage(item.enclosure!.url!),
+                                fit: BoxFit.cover)
+                            : null),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    Expanded(
+                        child: Container(
+                            color: AppColors.secondary.withAlpha(200),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      item.title ?? '',
+                                      style: bodyStyle,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Источник: ${Uri.parse(item.link!).host}',
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontStyle: FontStyle.italic),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Источник: ${Uri.parse(item.link!).host}',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontStyle: FontStyle.italic),
+                                      ),
                                     ),
-                                  ),
-                                  const Spacer(),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      item.formattedDate,
-                                      style:
-                                          const TextStyle(color: Colors.white),
+                                    const Spacer(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        item.formattedDate,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ))),
-                ],
-              ),
-            );
-          }),
+                                  ],
+                                )
+                              ],
+                            ))),
+                  ],
+                ),
+              );
+            }),
+      ),
     );
   }
 }

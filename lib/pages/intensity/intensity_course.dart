@@ -69,7 +69,7 @@ class IntensityCourse extends StatelessWidget {
                                   .sign
                                   .toInt()))
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.3,
+                              width: MediaQuery.of(context).size.width * 0.29,
                               child: InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(
@@ -96,7 +96,10 @@ class IntensityCourse extends StatelessWidget {
                                                 subject.key.$2 == '-1'
                                                     ? ''
                                                     : '${subject.value}% ',
-                                                style: context.headlineLarge),
+                                                style: context.useMobileLayout
+                                                    ? context.headlineLarge
+                                                        .copyWith(fontSize: 22)
+                                                    : context.headlineLarge),
                                             Flexible(
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
@@ -105,8 +108,13 @@ class IntensityCourse extends StatelessWidget {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     maxLines: 2,
-                                                    style:
-                                                        context.headlineMedium),
+                                                    style: context
+                                                            .useMobileLayout
+                                                        ? context.headlineMedium
+                                                            .copyWith(
+                                                                fontSize: 16.0)
+                                                        : context
+                                                            .headlineMedium),
                                               ),
                                             )
                                           ],

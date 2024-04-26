@@ -27,45 +27,50 @@ class BaseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-                color: AppColors.darkGreen,
-                border: Border.all(color: Colors.white),
-                borderRadius: BorderRadius.circular(64.0)),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FutureBuilder<ImageProvider>(
-                      future: getBaseImage(db),
-                      builder: (context, snapshot) {
-                        return CircleAvatar(
-                            radius: 64.0,
-                            backgroundColor: Colors.white,
-                            foregroundImage:
-                                snapshot.hasData ? snapshot.data! : null);
-                      }),
-                ),
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 16.0),
-                    child: Text(db.name,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.headlineLarge),
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: AppColors.darkGreen,
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(64.0)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FutureBuilder<ImageProvider>(
+                        future: getBaseImage(db),
+                        builder: (context, snapshot) {
+                          return CircleAvatar(
+                              radius: context.useMobileLayout ? 48.0 : 64.0,
+                              backgroundColor: Colors.white,
+                              foregroundImage:
+                                  snapshot.hasData ? snapshot.data! : null);
+                        }),
                   ),
-                )
-              ],
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
+                      child: Text(db.name,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.useMobileLayout
+                              ? context.headlineLarge.copyWith(fontSize: 24.0)
+                              : context.headlineLarge),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

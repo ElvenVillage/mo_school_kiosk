@@ -11,6 +11,10 @@ class TopFiveCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
+    final body = context.useMobileLayout
+        ? context.body.copyWith(fontSize: 16.0)
+        : context.body;
+
     return Column(
       children: [
         Container(
@@ -21,10 +25,8 @@ class TopFiveCard extends StatelessWidget {
                   child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(title,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: width / 1980 * 14.0,
-                        fontWeight: FontWeight.bold)),
+                    style: body.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
               )),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -34,17 +36,26 @@ class TopFiveCard extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(
-          height: 5.0,
-        ),
+        if (context.useMobileLayout)
+          const SizedBox(
+            height: 15.0,
+          )
+        else
+          const SizedBox(
+            height: 5.0,
+          ),
         Column(children: [
-          for (final entry in data)
+          for (final entry in data) ...[
+            if (context.useMobileLayout)
+              const SizedBox(
+                height: 15.0,
+              ),
             Row(
               children: [
                 Expanded(
                     child: Text(
                   entry.value.toString().replaceAll('.', ',') + entry.add,
-                  style: context.body.copyWith(color: AppColors.secondary),
+                  style: body.copyWith(color: AppColors.secondary),
                 )),
                 Expanded(
                     child: LinearProgressIndicator(
@@ -61,12 +72,12 @@ class TopFiveCard extends StatelessWidget {
                         entry.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.white, fontSize: width / 1980 * 18.0),
+                        style: body.copyWith(color: Colors.white),
                       ),
                     ))
               ],
             )
+          ]
         ])
       ],
     );
