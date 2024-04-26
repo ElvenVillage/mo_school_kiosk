@@ -5,9 +5,9 @@ part 'stats.g.dart';
 
 @JsonSerializable()
 class StatsData {
-  @JsonKey(name: 'idorganization')
+  @JsonKey(name: 'idOrganization')
   final String orgId;
-  @JsonKey(name: 'orgname')
+  @JsonKey(name: 'orgName')
   final String orgName;
   @JsonKey(name: 'ind')
   final String name;

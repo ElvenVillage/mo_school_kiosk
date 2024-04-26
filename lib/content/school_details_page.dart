@@ -109,7 +109,7 @@ class _SchoolDetailsPageState extends State<SchoolDetailsPage> {
 
     final values = [
       data.info.phone,
-      data.info.phone,
+      data.info.email ?? '',
       countData.fact.studentsPlural,
       countData.plan.studentsPlural,
       (countData.plan - countData.fact).studentsPlural,

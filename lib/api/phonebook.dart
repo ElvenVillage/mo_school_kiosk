@@ -9,6 +9,7 @@ class PhonebookInfo {
   final String schoolName;
   final String address;
   final String phone;
+  final String? email;
   final String fax;
   final String order;
   final String founded;
@@ -21,6 +22,7 @@ class PhonebookInfo {
       required this.schoolName,
       required this.address,
       required this.phone,
+      required this.email,
       required this.fax,
       required this.order,
       required this.founded});
