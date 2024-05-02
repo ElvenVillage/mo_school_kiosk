@@ -194,13 +194,41 @@ class _GradesCard extends StatelessWidget {
 
   final StudentDetais data;
 
+  Widget _row(String text, BuildContext context, TextStyle style) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            if (context.useMobileLayout) const SizedBox(width: 35),
+            Expanded(
+              child: Text(
+                text,
+                style: style,
+              ),
+            ),
+            const SizedBox(width: 45)
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final useMobileLayout = context.useMobileLayout;
     final headlineMedium = useMobileLayout
         ? context.headlineMedium.copyWith(fontSize: 16.0)
         : context.headlineMedium;
+
+    final headlineLarge = useMobileLayout
+        ? context.headlineLarge.copyWith(fontSize: 20.0)
+        : context.headlineLarge;
+
+    final rewards = data.awards.where((e) => e.isPenalty == '0');
+    // final penalties = data.awards.where((e) => e.isPenalty != '0');
+
     final grades = [
+      Text(
+        'Текущая успеваемость:',
+        style: headlineLarge.copyWith(decoration: TextDecoration.underline),
+      ),
       for (final subj in data.grades)
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -221,20 +249,25 @@ class _GradesCard extends StatelessWidget {
               )
             ],
           ),
-        )
+        ),
+      const SizedBox(height: 25),
+      Text(
+        'Поощрения:',
+        style: headlineLarge.copyWith(decoration: TextDecoration.underline),
+      ),
+      for (final award in rewards)
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _row(award.reason, context, headlineMedium),
+        ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!useMobileLayout) ...[
           const SizedBox(
-            height: 150,
+            height: 50,
           ),
-          Text(
-            'Текущая успеваемость:',
-            style: context.headlineLarge
-                .copyWith(decoration: TextDecoration.underline),
-          )
         ],
         const SizedBox(
           height: 50,

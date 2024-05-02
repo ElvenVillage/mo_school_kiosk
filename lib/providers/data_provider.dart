@@ -85,8 +85,11 @@ class StatsProvider extends ChangeNotifier {
   final schools = <School>[];
   final reports = <School, List<ReportData>>{};
 
+  static const reloadInterval = Duration(hours: 1);
+  static const errorReloadInterval = Duration(minutes: 1);
+
   void setupTimer() {
-    _timer = Timer.periodic(const Duration(minutes: 30), (_) {
+    _timer = Timer.periodic(reloadInterval, (_) {
       stats.clear();
       notifyListeners();
       load();
@@ -155,13 +158,13 @@ class StatsProvider extends ChangeNotifier {
           LmsLogger().log.e(
               'Could not fetch GeneralStatisticOne for ${school.dbName}, retrying...',
               error: e);
-          await Future.delayed(const Duration(seconds: 5));
+          await Future.delayed(errorReloadInterval);
         } catch (e) {
           LmsLogger().log.e(
               'Could not fetch GeneralStatisticOne for ${school.dbName}, retrying...',
               error: e);
           error = e.toString();
-          await Future.delayed(const Duration(seconds: 5));
+          await Future.delayed(errorReloadInterval);
         } finally {
           notifyListeners();
         }

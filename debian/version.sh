@@ -7,7 +7,7 @@ datePrefix="const kBuildDate = "
 buildDate=$(date +'%m.%d %H:%M')
 version="${prefix} \"${versionNumber}\";${datePrefix} \"${buildDate}\";"
 # echo $version | tee lib/consts.dart
-echo $versionNumber | tee debian/version
+echo $versionNumber >> debian/version
 
 debVersion="  Version: ${versionNumber}"
 file="debian/debian.yaml"

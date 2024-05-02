@@ -73,7 +73,20 @@ class StudentDetailsAnswer implements LmsAnswer {
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class StudentAward {
-  StudentAward();
+  final String date;
+  final String isPenalty;
+  final String kind;
+  final String reason;
+
+  StudentAward({
+    required this.date,
+    required this.isPenalty,
+    required this.kind,
+    required this.reason,
+  });
+
+  DateTime get awardDate => DateTime.parse(date);
+
   factory StudentAward.fromJson(Map<String, dynamic> json) =>
       _$StudentAwardFromJson(json);
 }
