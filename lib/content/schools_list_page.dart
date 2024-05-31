@@ -114,7 +114,7 @@ class _SchoolsListPageState extends State<SchoolsListPage> {
     await statefulMapController.fromGeoJson(data,
         borderColor: const Color.fromARGB(255, 202, 234, 235),
         borderWidth: 0.5,
-        color: AppColors.secondary,
+        fillColor: AppColors.secondary,
         isFilled: true);
 
     _updateMarkers();

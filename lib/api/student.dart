@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mo_school_kiosk/utils.dart';
 
@@ -78,6 +79,9 @@ class StudentAward {
   final String kind;
   final String reason;
 
+  static final _dateFormat = DateFormat('dd.MM.yyyy h:mm:ss');
+  static final _displayFormat = DateFormat('dd.MM.yyyy');
+
   StudentAward({
     required this.date,
     required this.isPenalty,
@@ -85,7 +89,8 @@ class StudentAward {
     required this.reason,
   });
 
-  DateTime get awardDate => DateTime.parse(date);
+  DateTime get awardDate => _dateFormat.parse(date);
+  String get displayDate => _displayFormat.format(awardDate);
 
   factory StudentAward.fromJson(Map<String, dynamic> json) =>
       _$StudentAwardFromJson(json);

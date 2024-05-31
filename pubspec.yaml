@@ -28,7 +28,6 @@ dependencies:
   logger: ^2.2.0
   map_controller_plus:
     git:
-      ref: e3618b2
       url: https://github.com/ElvenVillage/map_controller_plus.git
   provider: ^6.1.1
   retrofit: ^4.0.3

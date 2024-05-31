@@ -213,6 +213,7 @@ class _GradesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final useMobileLayout = context.useMobileLayout;
+
     final headlineMedium = useMobileLayout
         ? context.headlineMedium.copyWith(fontSize: 16.0)
         : context.headlineMedium;
@@ -258,7 +259,8 @@ class _GradesCard extends StatelessWidget {
       for (final award in rewards)
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: _row(award.reason, context, headlineMedium),
+          child: _row('${award.reason} (${award.displayDate})', context,
+              headlineMedium),
         ),
     ];
     return Column(

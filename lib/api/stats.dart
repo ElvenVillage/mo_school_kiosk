@@ -7,7 +7,7 @@ part 'stats.g.dart';
 class StatsData {
   @JsonKey(name: 'idOrganization')
   final String orgId;
-  @JsonKey(name: 'orgName')
+  @JsonKey(name: 'orgname')
   final String orgName;
   @JsonKey(name: 'ind')
   final String name;
